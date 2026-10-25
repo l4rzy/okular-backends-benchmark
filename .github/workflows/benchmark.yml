@@ -34,6 +34,7 @@ jobs:
     env:
       DEBIAN_FRONTEND: noninteractive
       BENCH_CONTAINER_IMAGE: ubuntu:26.04
+      UV_LINK_MODE: copy
       REPEATS: ${{ inputs.repeats || 30 }}
       QT_QPA_PLATFORM: offscreen
       QT_QPA_PLATFORMTHEME: generic
@@ -68,6 +69,12 @@ jobs:
           ref: ${{ inputs.plugin_ref || 'main' }}
           path: plugin
           persist-credentials: false
+
+      - name: Trust container checkout paths
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git config --global --add safe.directory "$GITHUB_WORKSPACE/plugin"
+          git -C "$GITHUB_WORKSPACE" rev-parse HEAD
 
       - name: Record plugin commit
         id: source

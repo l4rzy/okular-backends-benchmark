@@ -215,14 +215,14 @@ def update_readme(text, summaries):
              "Opening and worker startup are excluded. Each PDF has equal weight. "
              "Lines connect only comparable environment/corpus/protocol series. "
              "Intervals describe within-run variability, not hardware-independent uncertainty.", "",
-             "| Measured UTC | Source commit | Median ratio (95% interval) | Pairs/PDF | Series | Report |",
-             "|---|---|---:|---:|---|---|"]
+             "| Date | Source commit | Median ratio (95% interval) | Pairs/PDF | Report |",
+             "|---|---|---:|---:|---|"]
     for summary in reversed(summaries[-50:]):
         score = summary["score"]
         commit = summary["commit"]
-        lines.append(f'| {summary["timestamp_utc"]} | [{commit[:12]}](https://github.com/{summary["repository"]}/commit/{commit}) | '
+        lines.append(f'| {summary["timestamp_utc"][:10]} | [{commit[:12]}](https://github.com/{summary["repository"]}/commit/{commit}) | '
                      f'{score["median"]:.3f}× ({score["ci95"][0]:.3f}–{score["ci95"][1]:.3f}) | '
-                     f'{summary["configuration"]["repeats"]} | `{summary["series_id"]}` | '
+                     f'{summary["configuration"]["repeats"]} | '
                      f'[details](reports/{commit}/{summary["run_id"]}/report.md) |')
     lines += ["", "The latest 50 runs are listed here; all detailed reports remain under `reports/`.", END]
     block = "\n".join(lines)

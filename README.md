@@ -1,7 +1,7 @@
 # Okular Backends Benchmark
 
-Benchmarks comparing the **MuPDF-NG backend** with **Okular’s official Poppler
-backend**, using a versioned PDF corpus and tracking performance over time.
+Benchmarks comparing the **[MuPDF-NG backend](https://github.com/l4rzy/okular-mupdf-ng)** with **[Okular’s official Poppler
+backend](https://github.com/KDE/okular/tree/master/generators/poppler)**, using a versioned PDF corpus and tracking performance over time.
 
 <!-- benchmark-history:start -->
 ## Backend performance history
@@ -10,11 +10,11 @@ backend**, using a versioned PDF corpus and tracking performance over time.
 
 Median ratio = Poppler / MuPDF-NG rendering time; **above 1 favors MuPDF-NG**. Opening and worker startup are excluded. Each PDF has equal weight. Lines connect only comparable environment/corpus/protocol series. Intervals describe within-run variability, not hardware-independent uncertainty.
 
-| Measured UTC | Source commit | Median ratio (95% interval) | Pairs/PDF | Series | Report |
-|---|---|---:|---:|---|---|
-| 2026-10-25T17:51:13.787340+00:00 | [90636515fd15](https://github.com/l4rzy/okular-mupdf-ng/commit/90636515fd158d7a8662bfd1a82497d853e0f5a7) | 2.455× (2.453–2.462) | 20 | `81f18c06a23b0392` | [details](reports/90636515fd158d7a8662bfd1a82497d853e0f5a7/40216383522-1/report.md) |
-| 2026-10-25T15:03:34.922772+00:00 | [fee75c813b74](https://github.com/l4rzy/okular-mupdf-ng/commit/fee75c813b7455a2607915a7115f74ddc5972d59) | 2.260× (2.257–2.263) | 30 | `2c1bb0dcf088a9e7` | [details](reports/fee75c813b7455a2607915a7115f74ddc5972d59/40203127246-1/report.md) |
-| 2026-10-25T09:11:16.346147+00:00 | [fee75c813b74](https://github.com/l4rzy/okular-mupdf-ng/commit/fee75c813b7455a2607915a7115f74ddc5972d59) | 2.433× (2.428–2.435) | 20 | `81f18c06a23b0392` | [details](reports/fee75c813b7455a2607915a7115f74ddc5972d59/40177805050-1/report.md) |
+| Date | Source commit | Median ratio (95% interval) | Pairs/PDF | Report |
+|---|---|---:|---:|---|
+| 2026-10-25 | [90636515fd15](https://github.com/l4rzy/okular-mupdf-ng/commit/90636515fd158d7a8662bfd1a82497d853e0f5a7) | 2.455× (2.453–2.462) | 20 | [details](reports/90636515fd158d7a8662bfd1a82497d853e0f5a7/40216383522-1/report.md) |
+| 2026-10-25 | [fee75c813b74](https://github.com/l4rzy/okular-mupdf-ng/commit/fee75c813b7455a2607915a7115f74ddc5972d59) | 2.260× (2.257–2.263) | 30 | [details](reports/fee75c813b7455a2607915a7115f74ddc5972d59/40203127246-1/report.md) |
+| 2026-10-25 | [fee75c813b74](https://github.com/l4rzy/okular-mupdf-ng/commit/fee75c813b7455a2607915a7115f74ddc5972d59) | 2.433× (2.428–2.435) | 20 | [details](reports/fee75c813b7455a2607915a7115f74ddc5972d59/40177805050-1/report.md) |
 
 The latest 50 runs are listed here; all detailed reports remain under `reports/`.
 <!-- benchmark-history:end -->

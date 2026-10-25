@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "corpus_version": 1,
+  "created_utc": "2026-10-25T06:55:17.179091+00:00",
+  "papers": [
+    {
+      "arxiv_id": "2609.00625v1",
+      "title": "Inverse Rendering for Modeling with Line Primitives",
+      "authors": [
+        "Kenji Tojo",
+        "Ariel Shamir",
+        "Nobuyuki Umetani",
+        "Bernd Bickel"
+      ],
+      "source_url": "https://arxiv.org/pdf/2609.00625v1",
+      "abstract_url": "https://arxiv.org/abs/2609.00625v1",
+      "license": "CC-BY-4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "modified": false,
+      "sha256": "0e714e4d099fcbbd621410e33184c7e00f0bcb991bc4d5be3e47d1075a2d75fc",
+      "bytes": 49888825,
+      "pages": 14,
+      "path": "corpus/arxiv/2609.00625v1.pdf"
+    },
+    {
+      "arxiv_id": "2609.09123v1",
+      "title": "Mask Forcing: Improving Autoregressive Video Diffusion Distillation via Dual-Noise Masking Rollout",
+      "authors": [
+        "Zhuoran Zhao",
+        "Shengju Qian",
+        "Tongtong Liang",
+        "Xianghao Kong",
+        "Songchun Zhang",
+        "Junchao Huang",
+        "Guian Fang",
+        "Xin Wang",
+        "Pan Hui",
+        "Anyi Rao"
+      ],
+      "source_url": "https://arxiv.org/pdf/2609.09123v1",
+      "abstract_url": "https://arxiv.org/abs/2609.09123v1",
+      "license": "CC-BY-4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "modified": false,
+      "sha256": "50628e0850b791e6755c0ec70395bd85756d6a601ae9057fae2cc56fe8fe2bfa",
+      "bytes": 48875393,
+      "pages": 24,
+      "path": "corpus/arxiv/2609.09123v1.pdf"
+    },
+    {
+      "arxiv_id": "2610.26067v1",
+      "title": "PhysSkin++: Real-Time and Generalizable Physics-Based Animation via Self-Supervised Neural Skinning",
+      "authors": [
+        "Yuanhang Lei",
+        "Baofei Liu",
+        "Xingxuan Li",
+        "Tao Cheng",
+        "Zixuan Wang",
+        "Boming Zhao",
+        "Yujun Shen",
+        "Siyuan Huang",
+        "Ruizhen Hu",
+        "Peter Yichen Chen",
+        "Hujun Bao",
+        "Zhaopeng Cui"
+      ],
+      "source_url": "https://arxiv.org/pdf/2610.26067v1",
+      "abstract_url": "https://arxiv.org/abs/2610.26067v1",
+      "license": "CC-BY-4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "modified": false,
+      "sha256": "a1bd1d51ad61fcf14aae883a7e58f13afa245b20a16e9996e7e7c7b4046e71fe",
+      "bytes": 44514363,
+      "pages": 16,
+      "path": "corpus/arxiv/2610.26067v1.pdf"
+    }
+  ]
+}

@@ -1,0 +1,159 @@
+name: PDF backend benchmark
+
+on:
+  schedule:
+    - cron: '23 5 * * 1'
+  workflow_dispatch:
+    inputs:
+      plugin_ref:
+        description: Plugin branch, tag, or full commit hash
+        type: string
+        default: main
+      repeats:
+        description: Paired trials per PDF (even number, 20–100)
+        type: number
+        default: 30
+
+permissions:
+  contents: write
+
+concurrency:
+  group: backend-benchmark-results
+  cancel-in-progress: false
+
+jobs:
+  benchmark:
+    if: github.repository == 'l4rzy/okular-backends-benchmark' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    container:
+      image: ubuntu:26.04
+    defaults:
+      run:
+        shell: bash
+    env:
+      DEBIAN_FRONTEND: noninteractive
+      BENCH_CONTAINER_IMAGE: ubuntu:26.04
+      REPEATS: ${{ inputs.repeats || 30 }}
+      QT_QPA_PLATFORM: offscreen
+      QT_QPA_PLATFORMTHEME: generic
+
+    steps:
+      - name: Set temporary paths
+        run: |
+          echo "RESULTS_DIR=$RUNNER_TEMP/benchmark-results" >> "$GITHUB_ENV"
+          echo "RUN_DIR=$RUNNER_TEMP/benchmark-run" >> "$GITHUB_ENV"
+          echo "MPLCONFIGDIR=$RUNNER_TEMP/matplotlib" >> "$GITHUB_ENV"
+
+      - name: Install build dependencies
+        run: |
+          apt-get update
+          apt-get install --yes --no-install-recommends \
+            ca-certificates clang llvm cmake extra-cmake-modules g++ git \
+            libbrotli-dev libfreetype-dev libjpeg-dev libnss3-dev libnss3-tools \
+            libseccomp-dev make mold openssl libkf6config-dev libkf6configwidgets-dev \
+            libkf6coreaddons-dev libkf6i18n-dev libkf6kio-dev ninja-build \
+            okular okular-dev libpoppler-qt6-dev patch pkg-config python3 \
+            qt6-base-dev tesseract-ocr-eng zlib1g-dev
+
+      - name: Checkout benchmark and corpus
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Checkout plugin
+        uses: actions/checkout@v7
+        with:
+          repository: l4rzy/okular-mupdf-ng
+          ref: ${{ inputs.plugin_ref || 'main' }}
+          path: plugin
+          persist-credentials: false
+
+      - name: Record plugin commit
+        id: source
+        run: echo "commit=$(git -C plugin rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@07a047e608db84b3d8c06cd9a7c7dcc9c355c18e # v10.3.2
+        with:
+          enable-cache: false
+
+      - name: Prepare Python and report checkout
+        run: |
+          if ! [[ "$REPEATS" =~ ^([2-9][02468]|100)$ ]]; then
+            echo '::error::repeats must be an even integer between 20 and 100.'
+            exit 1
+          fi
+          uv sync --project bench --locked
+          git clone --depth 1 --branch main https://github.com/l4rzy/okular-backends-benchmark.git "$RESULTS_DIR"
+          mkdir -p "$RUN_DIR"
+          cp corpus/manifest.json "$RUN_DIR/corpus-manifest.json"
+          git rev-parse HEAD > "$RUN_DIR/benchmark-commit.txt"
+
+      - name: Build optimized plugin and benchmark
+        run: |
+          uv run --project bench --locked python plugin/scripts/download-mupdf.py
+          cmake -S plugin -B plugin/build-release -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ \
+            -DCMAKE_LINKER_TYPE=MOLD -DUSE_SYSTEM_MUPDF=OFF -DMUPDF_OPTIMIZED_BUILD=ON \
+            -DBUILD_TESTING=ON -DENABLE_MU_DEBUG=OFF -DENABLE_LTO=ON \
+            -DENABLE_BUILD_TREE_WORKER=ON -DDISABLE_WORKER_SANDBOX=OFF \
+            -DTESSDATA_DIR=/usr/share/tesseract-ocr/5/tessdata
+          cmake --build plugin/build-release --parallel 4
+          cmake -S bench -B bench/build -G Ninja -DCMAKE_BUILD_TYPE=Release \
+            -DPython3_EXECUTABLE="$GITHUB_WORKSPACE/bench/.venv/bin/python"
+          cmake --build bench/build --parallel 4
+
+      - name: Run tests before timing
+        run: |
+          ctest --test-dir plugin/build-release --output-on-failure --parallel 4
+          ctest --test-dir bench/build --output-on-failure
+
+      - name: Measure paired PDF trials
+        run: |
+          uv run --project bench --locked python bench/run.py --source-dir plugin \
+            --manifest corpus/manifest.json --repeats "$REPEATS" --pages 20 --width 1200 \
+            --output "$RUN_DIR/samples.jsonl" > "$RUN_DIR/console.txt"
+
+      - name: Compile reports and trend
+        env:
+          SOURCE_COMMIT: ${{ steps.source.outputs.commit }}
+          RUN_ID: ${{ github.run_id }}-${{ github.run_attempt }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          git -C "$RESULTS_DIR" pull --ff-only origin main
+          uv run --project bench --locked python bench/report.py \
+            --input "$RUN_DIR/samples.jsonl" --manifest "$RUN_DIR/corpus-manifest.json" \
+            --results-dir "$RESULTS_DIR" --commit "$SOURCE_COMMIT" \
+            --run-id "$RUN_ID" --run-url "$RUN_URL"
+          cat "$RESULTS_DIR/reports/$SOURCE_COMMIT/$RUN_ID/report.md" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Preserve measurements and reports
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: pdf-benchmark-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ env.RUN_DIR }}/
+            ${{ env.RESULTS_DIR }}/reports/${{ steps.source.outputs.commit }}/${{ github.run_id }}-${{ github.run_attempt }}/
+            ${{ env.RESULTS_DIR }}/trend.svg
+            ${{ env.RESULTS_DIR }}/README.md
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Publish results
+        env:
+          RESULTS_TOKEN: ${{ github.token }}
+          SOURCE_COMMIT: ${{ steps.source.outputs.commit }}
+          RUN_ID: ${{ github.run_id }}-${{ github.run_attempt }}
+        run: |
+          git -C "$RESULTS_DIR" config user.name 'github-actions[bot]'
+          git -C "$RESULTS_DIR" config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git -C "$RESULTS_DIR" add README.md trend.svg "reports/$SOURCE_COMMIT/$RUN_ID"
+          git -C "$RESULTS_DIR" commit -m "bench: $SOURCE_COMMIT ($RUN_ID)"
+          authorization=$(printf 'x-access-token:%s' "$RESULTS_TOKEN" | base64 -w0)
+          echo "::add-mask::$authorization"
+          GIT_CONFIG_COUNT=1 \
+            GIT_CONFIG_KEY_0=http.https://github.com/.extraheader \
+            GIT_CONFIG_VALUE_0="AUTHORIZATION: basic $authorization" \
+            git -C "$RESULTS_DIR" push origin HEAD:main

@@ -62,4 +62,24 @@ Keep corpus v1 unchanged once published. Future additions or replacements should
 
 The papers are third-party works licensed individually under CC BY 4.0. Retain the author credits, source links, license links, and original copyright/license notices when redistributing them.
 
-Benchmark automation and result history will be added separately.
+The benchmark harness and automation are licensed under GPL-3.0-or-later; see [COPYING](COPYING).
+
+## Running the benchmark
+
+The [standalone harness](bench/README.md) builds and measures a selected commit
+of [okular-mupdf-ng](https://github.com/l4rzy/okular-mupdf-ng) against the official
+installed Poppler backend. Use `make bench` locally with a separately built plugin.
+Python tooling and Matplotlib are managed by uv with locked dependencies.
+
+The **PDF backend benchmark** workflow runs weekly on Monday at 05:23 UTC and
+manually through the Actions tab. Manual runs accept a plugin branch, tag, or
+commit and the number of paired trials (default 30 per PDF). Results record the
+resolved plugin commit, benchmark commit, corpus, CPU, and dependency versions.
+No push trigger or cross-repository publishing secret is required.
+
+The headline is the median paired Poppler / MuPDF-NG rendering ratio; above 1
+favors MuPDF-NG. Each PDF has equal weight. The worker stays alive throughout
+each trial, and startup is reported separately. Successful runs append tables
+here, generate `trend.svg`, and retain detailed reports and compressed samples
+under `reports/<plugin-sha>/<run-attempt>/`. The first real published run creates
+the graph and history section. See the [methodology and CI setup](bench/README.md).

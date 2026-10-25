@@ -35,7 +35,7 @@ def fixture():
                              "corpus": {"sha256": "manifest"}, "document_id": paper["arxiv_id"],
                              "pdf_sha256": paper["sha256"], "page_count": 2, "backend": backend,
                              "trial": trial, "seed": trial, "plugin_sha256": backend, "plugin_version": "1",
-                             "qt_version": "6", "open_ms": 1, "open_to_first_page_ms": 2,
+                             "qt_version": "6", "sandbox_enforcement": "Relaxed", "open_ms": 1, "open_to_first_page_ms": 2,
                              "timestamp_utc": "2026-10-25T12:00:00+00:00",
                              "samples": [{"phase": phase, "page": page, "width": 1200, "height": 1600,
                                           "cached_before": False, "ok": True, "elapsed_ms": elapsed}
@@ -75,6 +75,8 @@ class TestReport(unittest.TestCase):
             "sandbox": lambda r: [v["environment"]["plugin_build"].update(DISABLE_WORKER_SANDBOX="ON") for v in r],
             "cache hit": lambda r: r[0]["samples"][0].update(cached_before=True),
             "wrong page": lambda r: r[0]["samples"][0].update(page=1),
+            "wrong page count": lambda r: r[0].update(page_count=1),
+            "wrong enforcement": lambda r: r[0].update(sandbox_enforcement="Strict"),
             "mismatched seed": lambda r: r[0].update(seed=99),
             "nan": lambda r: r[0]["samples"][0].update(elapsed_ms=float("nan")),
         }

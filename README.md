@@ -83,3 +83,8 @@ each trial, and startup is reported separately. Successful runs append tables
 here, generate `trend.svg`, and retain detailed reports and compressed samples
 under `reports/<plugin-sha>/<run-attempt>/`. The first real published run creates
 the graph and history section. See the [methodology and CI setup](bench/README.md).
+
+Benchmarks use Relaxed sandbox enforcement so real documents can open on
+container runners with partial hardening. Available worker sandbox protections
+remain enabled. Corpus page counts are checked before rendering, and failures
+stop immediately rather than timing error placeholders.

@@ -72,6 +72,7 @@ int main(int argc, char** argv)
                         { "pdf", "PDF to open", "path" },
                         { "width", "Page width in pixels; height preserves aspect ratio", "pixels", "1200" },
                         { "pages", "Maximum pages per workload phase", "count", "10" },
+                        { "expected-pages", "Required document page count from the corpus manifest", "count" },
                         { "seed", "Random jump seed", "number", "1" },
                         { "timeout-ms", "Timeout for each page request", "milliseconds", "30000" } });
     parser.process(app);
@@ -86,6 +87,10 @@ int main(int argc, char** argv)
     const unsigned int seed = parser.value("seed").toUInt(&seedOk);
     if (!widthOk || width < 1 || width > 16384 || !pagesOk || count < 1 || !timeoutOk || timeoutMs < 1 || !seedOk)
         return finish(report, "Invalid width (1..16384), pages (>0), timeout (>0), or seed (uint32)");
+    bool expectedPagesOk = false;
+    const int expectedPages = parser.value("expected-pages").toInt(&expectedPagesOk);
+    if (parser.isSet("expected-pages") && (!expectedPagesOk || expectedPages < 1))
+        return finish(report, "--expected-pages must be a positive integer");
     const QString pdf = QFileInfo(parser.value("pdf")).canonicalFilePath();
     if (pdf.isEmpty() || !QFileInfo(pdf).isFile() || QFileInfo(pdf).suffix().compare("pdf", Qt::CaseInsensitive) != 0)
         return finish(report, "--pdf must name an existing PDF file");
@@ -114,6 +119,9 @@ int main(int argc, char** argv)
     const auto config = KSharedConfig::openConfig("okular-mupdf-ngrc");
     KConfigGroup(config, "OCR").writeEntry("OcrTriggerMode", "Never");
     KConfigGroup(config, "General").writeEntry("HeuristicSynopsisEnabled", false);
+    // Match the generator tests: use every available worker protection without
+    // replacing the document with a Strict-mode gate page on container runners.
+    KConfigGroup(config, "General").writeEntry("SandboxEnforcement", "Relaxed");
     KConfigGroup(config, "Advanced")
         .writeEntry("CacheLastVacuum", QDateTime::currentDateTimeUtc().toString(Qt::ISODate));
     config->sync();
@@ -123,6 +131,7 @@ int main(int argc, char** argv)
     report["width"] = width;
     report["seed"] = static_cast<qint64>(seed);
     report["profile"] = "common-pdf-features";
+    report["sandbox_enforcement"] = "Relaxed";
     report["filesystem_cache"] = "uncontrolled";
 
     Observer observer;
@@ -146,6 +155,16 @@ int main(int argc, char** argv)
     if (QFileInfo(document.generatorInfo().fileName()).canonicalFilePath() != plugin)
         return finish(report, "Loaded generator does not match requested library");
     report["page_count"] = static_cast<int>(document.pages());
+    if (parser.isSet("expected-pages") && document.pages() != static_cast<uint>(expectedPages)) {
+        document.removeObserver(&observer);
+        document.closeDocument();
+        return finish(report,
+                      QString("%1: %2 reported %3 pages; corpus expects %4. Refusing to benchmark a placeholder or "
+                              "incomplete document.")
+                          .arg(pdf, backend)
+                          .arg(report["page_count"].toInt())
+                          .arg(expectedPages));
+    }
     QJsonArray samples;
     QString failure;
     for (const auto& request : Bench::makeRequests(static_cast<int>(document.pages()), count, seed)) {

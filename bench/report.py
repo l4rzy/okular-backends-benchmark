@@ -87,7 +87,10 @@ def build_summary(rows, manifest, manifest_sha, commit, repository, run_id, run_
         if identifier not in papers or row["pdf_sha256"] != papers[identifier]["sha256"]:
             raise ValueError("PDF is not in the verified corpus")
         if row["page_count"] != papers[identifier]["pages"]:
-            raise ValueError("Page count differs from the corpus manifest")
+            raise ValueError(f'{identifier}: {row["backend"]} trial {row["trial"]} reported '
+                             f'{row["page_count"]} pages; corpus expects {papers[identifier]["pages"]}')
+        if row.get("sandbox_enforcement") != "Relaxed":
+            raise ValueError("Unexpected benchmark sandbox enforcement profile")
         backend = row["backend"]
         if backend not in ("mupdfng", "poppler") or not 1 <= row["trial"] <= configuration["repeats"]:
             raise ValueError("Invalid backend or trial number")
@@ -144,6 +147,7 @@ def build_summary(rows, manifest, manifest_sha, commit, repository, run_id, run_
               "available_cpus": environment.get("available_cpus"),
               "container_image": environment.get("container_image"),
               "plugin_build": {key: value for key, value in build.items() if key != "CMAKE_CXX_COMPILER"},
+              "sandbox_enforcement": "Relaxed",
               "poppler_sha256": plugins["poppler"]["sha256"], "qt_version": next(iter(qt_versions)),
               "compiler": environment["versions"]["compiler"], "okular": environment["versions"]["okular"],
               "poppler": environment["versions"]["poppler"]}
@@ -173,6 +177,8 @@ def markdown_report(summary):
              "The headline is the median of those trial scores. "
              "The primary workload sums first-page and sequential-render request times, excluding document opening and worker startup. "
              "The worker stays alive for all requests in a trial.", "",
+             "MuPDF-NG uses **Relaxed sandbox enforcement**: available worker protections remain active, "
+             "and incomplete host hardening does not block document opening.", "",
              f'{summary["trials"]} successful backend trials; {summary["configuration"]["repeats"]} pairs per PDF; '
              f'series `{summary["series_id"]}`.', "", "## Per-document results", "",
              "Times are medians in milliseconds. Ratios are medians of paired ratios, not ratios of medians.", "",

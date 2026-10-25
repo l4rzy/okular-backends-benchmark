@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 import argparse
+import io
 import json
 from pathlib import Path
 import sys
@@ -39,7 +40,7 @@ class TestRunner(unittest.TestCase):
             corpus.mkdir()
             pdf = corpus / "paper.pdf"
             pdf.write_bytes(b"fixture")
-            paper = {"arxiv_id": "paper", "path": "corpus/paper.pdf", "sha256": run.file_hash(pdf)}
+            paper = {"arxiv_id": "paper", "path": "corpus/paper.pdf", "sha256": run.file_hash(pdf), "pages": 14}
             manifest = corpus / "manifest.json"
             def write(papers):
                 manifest.write_text(json.dumps({"papers": papers, "corpus_version": 1}))
@@ -47,12 +48,38 @@ class TestRunner(unittest.TestCase):
             papers, metadata = run.load_corpus(manifest)
             self.assertEqual(papers[0]["path"], pdf)
             self.assertEqual(metadata["sha256"], run.file_hash(manifest))
-            for entries in ([], [paper, paper], [{**paper, "sha256": "wrong"}],
+            for entries in ([], [paper, paper], [{**paper, "sha256": "wrong"}], [{**paper, "pages": 0}],
                             [{**paper, "path": "../outside.pdf"}]):
                 with self.subTest(entries=entries):
                     write(entries)
                     with self.assertRaises(ValueError):
                         run.load_corpus(manifest)
+
+    def test_first_failure_stops_repeated_trials_and_passes_expected_pages(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "cmake").mkdir()
+            (root / "cmake/mupdf.version").touch()
+            harness = root / "harness"
+            harness.touch()
+            plugin = root / "plugin.so"
+            plugin.touch()
+            output = root / "results.jsonl"
+            paper = {"id": "paper", "path": root / "paper.pdf", "sha256": "test", "pages": 14}
+            argv = ["run.py", "--source-dir", str(root), "--harness", str(harness),
+                    "--mupdf-plugin", str(plugin), "--manifest", str(root / "manifest.json"),
+                    "--repeats", "30", "--output", str(output)]
+            failure = {"status": "error", "error": "Page count mismatch", "exit_code": 1, "stderr": ""}
+            with patch.object(sys, "argv", argv), patch.object(run, "load_corpus", return_value=([paper], {})), \
+                 patch.object(run, "collect_environment", return_value={}), \
+                 patch.object(run, "run_trial", return_value=failure) as trial, \
+                 patch.object(sys, "stdout", io.StringIO()), patch.object(sys, "stderr", io.StringIO()):
+                self.assertEqual(run.main(), 1)
+            trial.assert_called_once()
+            command = trial.call_args.args[0]
+            self.assertEqual(command[command.index("--expected-pages") + 1], "14")
+            self.assertEqual(len(output.read_text().splitlines()), 1)
+            self.assertEqual(json.loads(output.read_text())["status"], "error")
 
     def test_pdf_path(self):
         for path in ("a.pdf", "a.PDF"):

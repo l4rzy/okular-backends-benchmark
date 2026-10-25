@@ -37,7 +37,11 @@ The plugin defaults to `PLUGIN_DIR/build-release/bin/okular_generators`.
 Override libraries with `--mupdf-plugin` and `--poppler-plugin` if needed;
 otherwise Poppler is discovered in installed Qt 6 plugin directories. The
 corresponding worker must be discoverable (`ENABLE_BUILD_TREE_WORKER=ON` for
-an uninstalled build). The worker sandbox remains enabled.
+an uninstalled build). The worker sandbox remains enabled. The harness explicitly
+selects **Relaxed sandbox enforcement**, matching the generator tests: available
+protections remain active, and incomplete hardening on a container runner does
+not replace the PDF with a Strict-mode error page. The profile is recorded in
+raw data and reports and identifies a separate trend series.
 
 Explicit PDFs are for local experiments; publishing requires a complete
 manifest-backed corpus. Use an even number of pairs to balance backend order.
@@ -86,8 +90,10 @@ new series. Bootstrap intervals describe within-run variation on this corpus.
 There is no performance merge gate. This measures offscreen backend delivery,
 not GUI scrolling, memory, or visual fidelity.
 
-Raw JSONL goes to `bench/results/`; `--output` selects a new file. Failed trials
-are retained and fail the command. Page and whole-trial timeouts include
+Raw JSONL goes to `bench/results/`; `--output` selects a new file. The harness
+checks manifest page counts immediately after opening, before rendering any
+pages. The first failed trial is retained and stops the run, with the document,
+backend, and expected/actual counts in mismatch errors. Page and whole-trial timeouts include
 terminating workers. Publication requires complete successful trials from
 clean plugin and benchmark checkouts, Release with diagnostics off, and the
 worker sandbox enabled.

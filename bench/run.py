@@ -112,8 +112,10 @@ def load_corpus(manifest_path):
             raise ValueError(f"Invalid or duplicate corpus entry: {identifier}")
         if file_hash(path) != paper["sha256"]:
             raise ValueError(f"Corpus checksum mismatch: {path}")
+        if type(paper["pages"]) is not int or paper["pages"] < 1:
+            raise ValueError(f"Invalid corpus page count: {identifier}")
         identifiers.add(identifier)
-        papers.append({"id": identifier, "path": path, "sha256": paper["sha256"]})
+        papers.append({"id": identifier, "path": path, "sha256": paper["sha256"], "pages": paper["pages"]})
     if not papers:
         raise ValueError("Corpus manifest has no papers")
     return papers, {"version": manifest["corpus_version"], "sha256": file_hash(manifest_path)}
@@ -234,6 +236,8 @@ def main():
                     plugin = args.mupdf_plugin if backend == "mupdfng" else args.poppler_plugin
                     if plugin:
                         command.extend(["--library", str(plugin.resolve())])
+                    if "pages" in paper:
+                        command.extend(["--expected-pages", str(paper["pages"])])
                     print(f"{pdf.name}: {backend}, trial {trial + 1}/{args.repeats}", file=sys.stderr)
                     report = run_trial(command, args.timeout)
                     report.update(schema_version=2, trial=trial + 1, pdf=str(pdf), pdf_sha256=paper["sha256"],
@@ -247,6 +251,8 @@ def main():
                     reports.append(report)
                     if report["status"] != "ok":
                         print(f"  ERROR: {report['error']} (stderr saved in JSONL)", file=sys.stderr)
+                        print(f"Stopped after the first failure. Results: {output}", file=sys.stderr)
+                        return 1
     print("\nPDF / backend / phase / cache: n, median ms, p95 ms (only when n >= 20)")
     for (pdf, backend, phase, cache), values in sorted(summarize(reports).items()):
         p95 = f"{percentile(values, 0.95):.3f}" if len(values) >= 20 else "-"

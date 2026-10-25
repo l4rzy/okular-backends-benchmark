@@ -12,6 +12,7 @@ Median ratio = Poppler / MuPDF-NG rendering time; **above 1 favors MuPDF-NG**. O
 
 | Date | Source commit | Median ratio (95% interval) | Pairs/PDF | Report |
 |---|---|---:|---:|---|
+| 2026-10-25 | [719a45dc838b](https://github.com/l4rzy/okular-mupdf-ng/commit/719a45dc838b57fb452312596f02749590f241e4) | 2.288× (2.284–2.291) | 30 | [details](reports/719a45dc838b57fb452312596f02749590f241e4/40234409410-1/report.md) |
 | 2026-10-25 | [90636515fd15](https://github.com/l4rzy/okular-mupdf-ng/commit/90636515fd158d7a8662bfd1a82497d853e0f5a7) | 2.455× (2.453–2.462) | 20 | [details](reports/90636515fd158d7a8662bfd1a82497d853e0f5a7/40216383522-1/report.md) |
 | 2026-10-25 | [fee75c813b74](https://github.com/l4rzy/okular-mupdf-ng/commit/fee75c813b7455a2607915a7115f74ddc5972d59) | 2.260× (2.257–2.263) | 30 | [details](reports/fee75c813b7455a2607915a7115f74ddc5972d59/40203127246-1/report.md) |
 | 2026-10-25 | [fee75c813b74](https://github.com/l4rzy/okular-mupdf-ng/commit/fee75c813b7455a2607915a7115f74ddc5972d59) | 2.433× (2.428–2.435) | 20 | [details](reports/fee75c813b7455a2607915a7115f74ddc5972d59/40177805050-1/report.md) |

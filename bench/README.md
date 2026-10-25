@@ -132,7 +132,7 @@ reports/<plugin-sha>/<run-attempt>/
   corpus-manifest.json            exact measured corpus snapshot
 ```
 
-Corpus licensing and attributions remain in the root README. Failed benchmarks
+Corpus licensing and attributions are recorded in [CREDITS.md](../CREDITS.md). Failed benchmarks
 retain workflow artifacts without publishing a normal score. Reports remain
 available as artifacts if pushing fails. Repeated runs have distinct paths.
 The trend SVG appears after the first successful published measurement; no

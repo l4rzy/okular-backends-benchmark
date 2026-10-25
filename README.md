@@ -88,3 +88,17 @@ Benchmarks use Relaxed sandbox enforcement so real documents can open on
 container runners with partial hardening. Available worker sandbox protections
 remain enabled. Corpus page counts are checked before rendering, and failures
 stop immediately rather than timing error placeholders.
+
+<!-- benchmark-history:start -->
+## Backend performance history
+
+![Paired rendering ratio over time](trend.svg)
+
+Median ratio = Poppler / MuPDF-NG rendering time; **above 1 favors MuPDF-NG**. Opening and worker startup are excluded. Each PDF has equal weight. Lines connect only comparable environment/corpus/protocol series. Intervals describe within-run variability, not hardware-independent uncertainty.
+
+| Measured UTC | Source commit | Median ratio (95% interval) | Pairs/PDF | Series | Report |
+|---|---|---:|---:|---|---|
+| 2026-10-25T09:11:16.346147+00:00 | [fee75c813b74](https://github.com/l4rzy/okular-mupdf-ng/commit/fee75c813b7455a2607915a7115f74ddc5972d59) | 2.433× (2.428–2.435) | 20 | `81f18c06a23b0392` | [details](reports/fee75c813b7455a2607915a7115f74ddc5972d59/40177805050-1/report.md) |
+
+The latest 50 runs are listed here; all detailed reports remain under `reports/`.
+<!-- benchmark-history:end -->

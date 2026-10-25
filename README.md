@@ -12,6 +12,17 @@ These unmodified PDFs were downloaded from the versioned arXiv URLs listed below
 | [Mask Forcing: Improving Autoregressive Video Diffusion Distillation via Dual-Noise Masking Rollout](https://arxiv.org/abs/2609.09123v1) | [2609.09123v1](corpus/arxiv/2609.09123v1.pdf) | 24 | 46.61 | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) |
 | [PhysSkin++: Real-Time and Generalizable Physics-Based Animation via Self-Supervised Neural Skinning](https://arxiv.org/abs/2610.26067v1) | [2610.26067v1](corpus/arxiv/2610.26067v1.pdf) | 16 | 42.45 | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) |
 
+## Additional requested sources (download only)
+
+These papers are identified for future benchmark downloads directly from arXiv. Their PDFs are not stored in this repository: the arXiv non-exclusive distribution license does not grant this project redistribution rights. Mirroring them requires separate permission from the relevant copyright holder or a suitable additional license.
+
+| Paper | Versioned source | Assigned license |
+|---|---|---|
+| [A Combined Streaming FPGA Architecture for Client-Side CKKS Encoding and Encryption](https://arxiv.org/abs/2610.27204v1) | [2610.27204v1](https://arxiv.org/pdf/2610.27204v1) | [arXiv non-exclusive distribution license](https://arxiv.org/licenses/nonexclusive-distrib/1.0/) |
+| [SweepANN: A GPU-Accelerated Large-K Approximate Vector Search for Drug Discovery](https://arxiv.org/abs/2610.27306v1) | [2610.27306v1](https://arxiv.org/pdf/2610.27306v1) | [arXiv non-exclusive distribution license](https://arxiv.org/licenses/nonexclusive-distrib/1.0/) |
+
+Metadata for these sources is stored separately in `download_only` within `corpus/manifest.json`. They are not part of the mirrored corpus checksum list.
+
 ## Attribution
 
 ### Inverse Rendering for Modeling with Line Primitives
@@ -34,7 +45,7 @@ Original version: [2610.26067v1](https://arxiv.org/abs/2610.26067v1). [Original 
 
 ## Integrity and reproducibility
 
-`corpus/manifest.json` records versioned sources, authors, license links, page counts, byte sizes, and SHA-256 hashes. The corpus contains only the three identified arXiv papers; other local books and documents are not included.
+`corpus/manifest.json` records versioned sources, authors, license links, page counts, byte sizes, and SHA-256 hashes. The mirrored corpus contains only the three CC BY 4.0 arXiv papers; additional download-only sources are listed separately. Other local books and documents are not included.
 
 Verify files from the repository root:
 

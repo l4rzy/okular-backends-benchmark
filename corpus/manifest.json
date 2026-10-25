@@ -74,5 +74,39 @@
       "pages": 16,
       "path": "corpus/arxiv/2610.26067v1.pdf"
     }
+  ],
+  "download_only": [
+    {
+      "arxiv_id": "2610.27204v1",
+      "title": "A Combined Streaming FPGA Architecture for Client-Side CKKS Encoding and Encryption",
+      "authors": [
+        "Kurina, Joseph",
+        "Pasca, Bogdan",
+        "Demirsoy, Suleyman",
+        "Kim, Sunwoong"
+      ],
+      "source_url": "https://arxiv.org/pdf/2610.27204v1",
+      "abstract_url": "https://arxiv.org/abs/2610.27204v1",
+      "license": "LicenseRef-arXiv-nonexclusive-distrib-1.0",
+      "license_url": "https://arxiv.org/licenses/nonexclusive-distrib/1.0/",
+      "mirrored": false,
+      "reason": "The assigned license grants distribution rights to arXiv, not permission for this repository to redistribute the PDF."
+    },
+    {
+      "arxiv_id": "2610.27306v1",
+      "title": "SweepANN: A GPU-Accelerated Large-K Approximate Vector Search for Drug Discovery",
+      "authors": [
+        "Zhang, Zhenyu",
+        "Lin, Qi",
+        "Zhang, Nan",
+        "Cao, Zhichao"
+      ],
+      "source_url": "https://arxiv.org/pdf/2610.27306v1",
+      "abstract_url": "https://arxiv.org/abs/2610.27306v1",
+      "license": "LicenseRef-arXiv-nonexclusive-distrib-1.0",
+      "license_url": "https://arxiv.org/licenses/nonexclusive-distrib/1.0/",
+      "mirrored": false,
+      "reason": "The assigned license grants distribution rights to arXiv, not permission for this repository to redistribute the PDF."
+    }
   ]
 }

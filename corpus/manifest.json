@@ -73,40 +73,57 @@
       "bytes": 44514363,
       "pages": 16,
       "path": "corpus/arxiv/2610.26067v1.pdf"
-    }
-  ],
-  "download_only": [
-    {
-      "arxiv_id": "2610.27204v1",
-      "title": "A Combined Streaming FPGA Architecture for Client-Side CKKS Encoding and Encryption",
-      "authors": [
-        "Kurina, Joseph",
-        "Pasca, Bogdan",
-        "Demirsoy, Suleyman",
-        "Kim, Sunwoong"
-      ],
-      "source_url": "https://arxiv.org/pdf/2610.27204v1",
-      "abstract_url": "https://arxiv.org/abs/2610.27204v1",
-      "license": "LicenseRef-arXiv-nonexclusive-distrib-1.0",
-      "license_url": "https://arxiv.org/licenses/nonexclusive-distrib/1.0/",
-      "mirrored": false,
-      "reason": "The assigned license grants distribution rights to arXiv, not permission for this repository to redistribute the PDF."
     },
     {
-      "arxiv_id": "2610.27306v1",
-      "title": "SweepANN: A GPU-Accelerated Large-K Approximate Vector Search for Drug Discovery",
+      "arxiv_id": "2312.00752v2",
+      "title": "Mamba: Linear-Time Sequence Modeling with Selective State Spaces",
       "authors": [
-        "Zhang, Zhenyu",
-        "Lin, Qi",
-        "Zhang, Nan",
-        "Cao, Zhichao"
+        "Gu, Albert",
+        "Dao, Tri"
       ],
-      "source_url": "https://arxiv.org/pdf/2610.27306v1",
-      "abstract_url": "https://arxiv.org/abs/2610.27306v1",
-      "license": "LicenseRef-arXiv-nonexclusive-distrib-1.0",
-      "license_url": "https://arxiv.org/licenses/nonexclusive-distrib/1.0/",
-      "mirrored": false,
-      "reason": "The assigned license grants distribution rights to arXiv, not permission for this repository to redistribute the PDF."
+      "source_url": "https://arxiv.org/pdf/2312.00752v2",
+      "abstract_url": "https://arxiv.org/abs/2312.00752v2",
+      "license": "CC-BY-4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "modified": false,
+      "sha256": "adf70ed1803c85b1899dec3e21f3af0b124411439e8654b840ea65f7b9f52b2e",
+      "bytes": 1168615,
+      "pages": 36,
+      "path": "corpus/arxiv/2312.00752v2.pdf",
+      "workload": "math, algorithms, numerical tables"
+    },
+    {
+      "arxiv_id": "2307.03109v9",
+      "title": "A Survey on Evaluation of Large Language Models",
+      "authors": [
+        "Chang, Yupeng",
+        "Wang, Xu",
+        "Wang, Jindong",
+        "Wu, Yuan",
+        "Yang, Linyi",
+        "Zhu, Kaijie",
+        "Chen, Hao",
+        "Yi, Xiaoyuan",
+        "Wang, Cunxiang",
+        "Wang, Yidong",
+        "Ye, Wei",
+        "Zhang, Yue",
+        "Chang, Yi",
+        "Yu, Philip S.",
+        "Yang, Qiang",
+        "Xie, Xing"
+      ],
+      "source_url": "https://arxiv.org/pdf/2307.03109v9",
+      "abstract_url": "https://arxiv.org/abs/2307.03109v9",
+      "license": "CC-BY-4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "modified": false,
+      "sha256": "af3302fa29c8533ac06338e537c8c79a3afa02e3299f4763f9687715aa99cdeb",
+      "bytes": 1029796,
+      "pages": 45,
+      "path": "corpus/arxiv/2307.03109v9.pdf",
+      "workload": "dense text, survey tables, references"
     }
-  ]
+  ],
+  "updated_utc": "2026-10-25T07:08:43.495649+00:00"
 }

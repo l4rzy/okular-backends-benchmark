@@ -240,6 +240,7 @@ def plot_trend(summaries, output):
     matplotlib.use("Agg")
     import matplotlib.dates as dates
     import matplotlib.pyplot as plt
+    from matplotlib.ticker import StrMethodFormatter
 
     series = defaultdict(list)
     for summary in summaries:
@@ -255,6 +256,7 @@ def plot_trend(summaries, output):
             axis.errorbar(x, y, yerr=errors, fmt="o-", markersize=4, capsize=3, label=label)
         axis.axhline(1, color="gray", linestyle="--", linewidth=1)
         axis.set_yscale("log", base=2)
+        axis.yaxis.set_major_formatter(StrMethodFormatter("{x:g}"))
         axis.set_ylabel("Median Poppler / MuPDF-NG rendering ratio")
         axis.set_xlabel("Measurement time (UTC); source commits are listed in README")
         axis.set_title("Okular PDF backend rendering — above 1 favors MuPDF-NG")

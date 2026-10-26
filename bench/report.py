@@ -199,7 +199,7 @@ def markdown_report(summary):
     lines += ["", "## Environment", "", "```json", json.dumps(summary["environment"], indent=2), "```", "",
               "## Interpretation limits", "",
               "Paired trials reduce host-speed noise, but CPU architectures can favor the backends differently. "
-              "CPU, baseline binary, dependencies, corpus, harness, and settings identify separate trend series. "
+              "Graph lines group runs by CPU model and Poppler version; other environment and benchmark settings remain recorded in the reports. "
               "Bootstrap intervals resample whole paired trial scores; repeated pages are not independent samples of all PDFs. "
               "This is an offscreen rendering benchmark, not a GUI scrolling, memory, or visual-fidelity measurement. "
               "OS file caches are warm/uncontrolled. No performance merge gate is applied.", "",
@@ -213,7 +213,7 @@ def update_readme(text, summaries):
              "![Paired rendering ratio over time](trend.svg)", "",
              "Median ratio = Poppler / MuPDF-NG rendering time; **above 1 favors MuPDF-NG**. "
              "Opening and worker startup are excluded. Each PDF has equal weight. "
-             "Lines connect only comparable environment/corpus/protocol series. "
+             "Lines group runs by CPU model and Poppler version. "
              "Intervals describe within-run variability, not hardware-independent uncertainty.", "",
              "| Date | Source commit | Median ratio (95% interval) | Pairs/PDF | Report |",
              "|---|---|---:|---:|---|"]
@@ -244,15 +244,17 @@ def plot_trend(summaries, output):
 
     series = defaultdict(list)
     for summary in summaries:
-        series[summary["series_id"]].append(summary)
+        key = (summary["environment"]["cpu_model"], summary["series"]["poppler"])
+        series[key].append(summary)
     with plt.rc_context({"svg.hashsalt": "okular-backends-benchmark", "font.size": 9}):
         figure, axis = plt.subplots(figsize=(11, 5), layout="constrained")
-        for identifier, points in series.items():
+        for (cpu_model, poppler_version), points in sorted(series.items()):
+            points.sort(key=lambda point: (point["timestamp_utc"], point["run_id"]))
             x = [datetime.fromisoformat(point["timestamp_utc"]) for point in points]
             y = [point["score"]["median"] for point in points]
             errors = [[point["score"]["median"] - point["score"]["ci95"][0] for point in points],
                       [point["score"]["ci95"][1] - point["score"]["median"] for point in points]]
-            label = f'{points[-1]["environment"]["cpu_model"]} / Poppler {points[-1]["series"]["poppler"]} / {identifier[:8]}'
+            label = f"{cpu_model} / Poppler {poppler_version}"
             axis.errorbar(x, y, yerr=errors, fmt="o-", markersize=4, capsize=3, label=label)
         axis.axhline(1, color="gray", linestyle="--", linewidth=1)
         axis.set_yscale("log", base=2)
@@ -265,7 +267,7 @@ def plot_trend(summaries, output):
         axis.xaxis.set_major_formatter(dates.ConciseDateFormatter(locator, tz=timezone.utc))
         axis.grid(True, alpha=.2)
         axis.legend(loc="upper left", bbox_to_anchor=(0, -.2), fontsize=7)
-        figure.savefig(output, format="svg", metadata={"Date": None, "Description": "Paired ratios; comparable series only; see README for source commits."})
+        figure.savefig(output, format="svg", metadata={"Date": None, "Description": "Paired ratios grouped by CPU model and Poppler version; see README for source commits."})
         plt.close(figure)
 
 

@@ -41,7 +41,7 @@ an uninstalled build). The worker sandbox remains enabled. The harness explicitl
 selects **Relaxed sandbox enforcement**, matching the generator tests: available
 protections remain active, and incomplete hardening on a container runner does
 not replace the PDF with a Strict-mode error page. The profile is recorded in
-raw data and reports and identifies a separate trend series.
+raw data and reports.
 
 Explicit PDFs are for local experiments; publishing requires a complete
 manifest-backed corpus. Use an even number of pairs to balance backend order.
@@ -84,9 +84,9 @@ appear in the detailed tables. Random/revisit requests are descriptive, with
 hits and misses separate; p95 needs 20 samples.
 
 Thirty pairs reduce runner noise; ratios do not remove CPU-specific effects
-or host contention. Lines connect only matching CPU, baseline binary,
-compiler/dependency versions, corpus, protocol, and settings. Changes start a
-new series. Bootstrap intervals describe within-run variation on this corpus.
+or host contention. Graph lines group runs by CPU model and Poppler version
+only. Other dependencies, corpus, protocol, and settings remain recorded in
+the reports. Bootstrap intervals describe within-run variation on this corpus.
 There is no performance merge gate. This measures offscreen backend delivery,
 not GUI scrolling, memory, or visual fidelity.
 
@@ -109,11 +109,12 @@ plugin branch, tag, or full commit hash and an even 20–100 pairs per PDF
 An Ubuntu 26.04 runner hosts an `archlinux:latest` container. Each run fully
 upgrades Arch packages before building, using the current repository versions
 of Okular, Poppler, Qt, and KDE Frameworks. Installed package versions are
-retained in the run artifacts; dependency changes start a new graph series.
+retained in the run artifacts. CPU model or Poppler version changes start a
+new graph series.
 CI builds the plugin from source in Release with diagnostics off and LTO on,
 runs all plugin and benchmark tests, then measures
-without concurrent builds or tests. CPU and dependency metadata identify
-comparable series. Python and Matplotlib use uv; graphing happens after timing.
+without concurrent builds or tests. CPU model and Poppler version identify
+graph series. Python and Matplotlib use uv; graphing happens after timing.
 The corpus is read from this checkout without copying its PDFs.
 
 Publishing uses this repository's built-in `GITHUB_TOKEN` with `contents: write`.
@@ -128,7 +129,7 @@ publishing does not alter the harness checkout used for measurements:
 
 ```text
 README.md                         latest 50 plugin commits and median ratios
-trend.svg                         measurements grouped by comparable series
+trend.svg                         measurements grouped by CPU model and Poppler version
 reports/<plugin-sha>/<run-attempt>/
   report.md                       per-PDF and per-request tables, environment
   summary.json                    aggregate and provenance

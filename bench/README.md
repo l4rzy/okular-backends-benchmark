@@ -106,8 +106,12 @@ trigger. Weekly runs build the plugin's latest `main`; manual runs accept a
 plugin branch, tag, or full commit hash and an even 20–100 pairs per PDF
 (default 30). The resolved full plugin SHA is always recorded.
 
-An Ubuntu 24.04 runner hosts an Ubuntu 26.04 container. CI builds Release with
-diagnostics off and LTO on, runs all plugin and benchmark tests, then measures
+An Ubuntu 26.04 runner hosts an `archlinux:latest` container. Each run fully
+upgrades Arch packages before building, using the current repository versions
+of Okular, Poppler, Qt, and KDE Frameworks. Installed package versions are
+retained in the run artifacts; dependency changes start a new graph series.
+CI builds the plugin from source in Release with diagnostics off and LTO on,
+runs all plugin and benchmark tests, then measures
 without concurrent builds or tests. CPU and dependency metadata identify
 comparable series. Python and Matplotlib use uv; graphing happens after timing.
 The corpus is read from this checkout without copying its PDFs.

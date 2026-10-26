@@ -24,16 +24,15 @@ concurrency:
 jobs:
   benchmark:
     if: github.repository == 'l4rzy/okular-backends-benchmark' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 90
     container:
-      image: ubuntu:26.04
+      image: archlinux:latest
     defaults:
       run:
         shell: bash
     env:
-      DEBIAN_FRONTEND: noninteractive
-      BENCH_CONTAINER_IMAGE: ubuntu:26.04
+      BENCH_CONTAINER_IMAGE: archlinux:latest
       UV_LINK_MODE: copy
       REPEATS: ${{ inputs.repeats || 30 }}
       QT_QPA_PLATFORM: offscreen
@@ -46,16 +45,14 @@ jobs:
           echo "RUN_DIR=$RUNNER_TEMP/benchmark-run" >> "$GITHUB_ENV"
           echo "MPLCONFIGDIR=$RUNNER_TEMP/matplotlib" >> "$GITHUB_ENV"
 
-      - name: Install build dependencies
+      - name: Upgrade Arch and install build dependencies
         run: |
-          apt-get update
-          apt-get install --yes --no-install-recommends \
-            ca-certificates clang llvm cmake extra-cmake-modules g++ git \
-            libbrotli-dev libfreetype-dev libjpeg-dev libnss3-dev libnss3-tools \
-            libseccomp-dev make mold openssl libkf6config-dev libkf6configwidgets-dev \
-            libkf6coreaddons-dev libkf6i18n-dev libkf6kio-dev ninja-build \
-            okular okular-dev libpoppler-qt6-dev patch pkg-config python3 \
-            qt6-base-dev tesseract-ocr-eng zlib1g-dev
+          pacman -Sy --noconfirm archlinux-keyring
+          pacman -Syu --noconfirm --needed \
+            base-devel ca-certificates clang llvm cmake extra-cmake-modules git \
+            brotli freetype2 libjpeg-turbo nss libseccomp mold openssl \
+            kconfig kconfigwidgets kcoreaddons ki18n kio kxmlgui kwidgetsaddons \
+            ninja okular poppler-qt6 python qt6-base tesseract-data-eng zlib
 
       - name: Checkout benchmark and corpus
         uses: actions/checkout@v7
@@ -96,6 +93,7 @@ jobs:
           mkdir -p "$RUN_DIR"
           cp corpus/manifest.json "$RUN_DIR/corpus-manifest.json"
           git rev-parse HEAD > "$RUN_DIR/benchmark-commit.txt"
+          pacman -Q > "$RUN_DIR/installed-packages.txt"
 
       - name: Build optimized plugin and benchmark
         run: |
@@ -105,7 +103,7 @@ jobs:
             -DCMAKE_LINKER_TYPE=MOLD -DUSE_SYSTEM_MUPDF=OFF -DMUPDF_OPTIMIZED_BUILD=ON \
             -DBUILD_TESTING=ON -DENABLE_MU_DEBUG=OFF -DENABLE_LTO=ON \
             -DENABLE_BUILD_TREE_WORKER=ON -DDISABLE_WORKER_SANDBOX=OFF \
-            -DTESSDATA_DIR=/usr/share/tesseract-ocr/5/tessdata
+            -DTESSDATA_DIR=/usr/share/tessdata
           cmake --build plugin/build-release --parallel 4
           cmake -S bench -B bench/build -G Ninja -DCMAKE_BUILD_TYPE=Release \
             -DPython3_EXECUTABLE="$GITHUB_WORKSPACE/bench/.venv/bin/python"

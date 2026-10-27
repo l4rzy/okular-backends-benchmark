@@ -1,0 +1,2217 @@
+{
+  "schema_version": 1,
+  "commit": "c009bf850cb10fb85ee4d5dea6db2f774085bc89",
+  "repository": "l4rzy/okular-mupdf-ng",
+  "run_id": "40444225258-1",
+  "run_url": "https://github.com/l4rzy/okular-backends-benchmark/actions/runs/40444225258",
+  "workflow_repository": "l4rzy/okular-backends-benchmark",
+  "timestamp_utc": "2026-10-27T04:00:42.662499+00:00",
+  "series_id": "d2c307ea82a68627",
+  "series": {
+    "protocol": "pdf-render-v1",
+    "protocol_sha256": "7c757dec53e8b246baf949af0ed909a28327142a47f17ebf98cbbd308a744d72",
+    "corpus_sha256": "3f7cbb69936a4067423beaffea2333fc7756f4288cd5a5f12cac647c7eedf862",
+    "cpu_model": "AMD EPYC 7763 64-Core Processor",
+    "machine": "x86_64",
+    "configuration": {
+      "repeats": 30,
+      "pages": 20,
+      "width": 1200,
+      "seed": 1
+    },
+    "available_cpus": 4,
+    "container_image": "archlinux:latest",
+    "plugin_build": {
+      "CMAKE_BUILD_TYPE": "Release",
+      "DISABLE_WORKER_SANDBOX": "OFF",
+      "ENABLE_BUILD_TREE_WORKER": "ON",
+      "ENABLE_LTO": "ON",
+      "ENABLE_MU_DEBUG": "OFF",
+      "MUPDF_CJK_FALLBACK": "droidfull",
+      "MUPDF_OPTIMIZED_BUILD": "ON",
+      "USE_SYSTEM_MUPDF": "OFF"
+    },
+    "sandbox_enforcement": "Relaxed",
+    "poppler_sha256": "1ef59913223c7e92e29f1ec223857fa7933877961f77c5ee3e15f90e8f6a5d1f",
+    "qt_version": "6.12.0",
+    "compiler": "clang version 23.1.4\nTarget: x86_64-pc-linux-gnu\nThread model: posix\nInstalledDir: /usr/bin",
+    "okular": "okular 26.08.2",
+    "poppler": "26.10.0"
+  },
+  "environment": {
+    "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.44",
+    "machine": "x86_64",
+    "cpu_model": "AMD EPYC 7763 64-Core Processor",
+    "logical_cpus": 4,
+    "available_cpus": 4,
+    "python": "3.14.8",
+    "plugin_build": {
+      "CMAKE_BUILD_TYPE": "Release",
+      "CMAKE_CXX_COMPILER": "/usr/sbin/clang++",
+      "DISABLE_WORKER_SANDBOX": "OFF",
+      "ENABLE_BUILD_TREE_WORKER": "ON",
+      "ENABLE_LTO": "ON",
+      "ENABLE_MU_DEBUG": "OFF",
+      "MUPDF_CJK_FALLBACK": "droidfull",
+      "MUPDF_OPTIMIZED_BUILD": "ON",
+      "USE_SYSTEM_MUPDF": "OFF"
+    },
+    "protocol": "pdf-render-v1",
+    "protocol_sha256": "7c757dec53e8b246baf949af0ed909a28327142a47f17ebf98cbbd308a744d72",
+    "source_commit": "c009bf850cb10fb85ee4d5dea6db2f774085bc89",
+    "source_dirty": false,
+    "benchmark_commit": "4419de62188a1d3dd28beffc26940b8533274a16",
+    "benchmark_dirty": false,
+    "runner_image": "local",
+    "runner_image_version": "local",
+    "container_image": "archlinux:latest",
+    "versions": {
+      "poppler": "26.10.0",
+      "okular": "okular 26.08.2",
+      "compiler": "clang version 23.1.4\nTarget: x86_64-pc-linux-gnu\nThread model: posix\nInstalledDir: /usr/bin",
+      "mupdf": "1.28.5"
+    }
+  },
+  "plugins": {
+    "mupdfng": {
+      "sha256": "cb14b39d80b0d6601ef2a0a0c4cb5d68e0f1f419fdbf62af67794dfcac2307c0",
+      "version": "0.5.4"
+    },
+    "poppler": {
+      "sha256": "1ef59913223c7e92e29f1ec223857fa7933877961f77c5ee3e15f90e8f6a5d1f",
+      "version": "0.6.5"
+    }
+  },
+  "configuration": {
+    "repeats": 30,
+    "pages": 20,
+    "width": 1200,
+    "seed": 1
+  },
+  "score": {
+    "n": 30,
+    "median": 2.214418955078343,
+    "min": 2.1855910292041876,
+    "max": 2.265785613640394,
+    "p95": 2.25909026826602,
+    "ci95": [
+      2.20926723772746,
+      2.22731962046535
+    ]
+  },
+  "documents": [
+    {
+      "id": "2609.00625v1",
+      "title": "Inverse Rendering for Modeling with Line Primitives",
+      "pages": 14,
+      "ratios": {
+        "render_ms": {
+          "n": 30,
+          "median": 2.448010150851327,
+          "min": 2.375417884146,
+          "max": 2.542057261749313,
+          "p95": 2.537041324514295,
+          "ci95": [
+            2.433358214186975,
+            2.4625482165342247
+          ]
+        },
+        "open_ms": {
+          "n": 30,
+          "median": 0.39583481309831703,
+          "min": 0.12852798049194422,
+          "max": 0.5054750965439772,
+          "p95": 0.4221826090856093,
+          "ci95": [
+            0.3913849940524968,
+            0.4016368076499103
+          ]
+        },
+        "open_to_first_page_ms": {
+          "n": 30,
+          "median": 2.4926196242406533,
+          "min": 2.190037808505122,
+          "max": 2.6386299674645812,
+          "p95": 2.6252868089502464,
+          "ci95": [
+            2.4802175179827692,
+            2.5087230373062415
+          ]
+        }
+      },
+      "timings": {
+        "mupdfng": {
+          "render_ms": {
+            "n": 30,
+            "median": 2845.96339,
+            "min": 2772.695843,
+            "max": 2955.147905,
+            "p95": 2936.858545
+          },
+          "open_ms": {
+            "n": 30,
+            "median": 24.21078,
+            "min": 22.869139,
+            "max": 72.988924,
+            "p95": 28.859553
+          },
+          "open_to_first_page_ms": {
+            "n": 30,
+            "median": 249.73736050000002,
+            "min": 245.527191,
+            "max": 299.767672,
+            "p95": 286.652169
+          }
+        },
+        "poppler": {
+          "render_ms": {
+            "n": 30,
+            "median": 6979.443418500001,
+            "min": 6940.015961,
+            "max": 7077.603117,
+            "p95": 7072.324242
+          },
+          "open_ms": {
+            "n": 30,
+            "median": 9.546357,
+            "min": 9.307166,
+            "max": 11.706366,
+            "p95": 10.438268
+          },
+          "open_to_first_page_ms": {
+            "n": 30,
+            "median": 623.6878770000001,
+            "min": 617.820631,
+            "max": 677.599244,
+            "p95": 675.884993
+          }
+        }
+      },
+      "requests": [
+        {
+          "backend": "mupdfng",
+          "phase": "first_page",
+          "cache": "miss",
+          "n": 30,
+          "median": 226.043746,
+          "min": 222.190698,
+          "max": 262.061712,
+          "p95": 241.473425
+        },
+        {
+          "backend": "mupdfng",
+          "phase": "random",
+          "cache": "hit",
+          "n": 420,
+          "median": 0.000651,
+          "min": 0.00032,
+          "max": 0.024656,
+          "p95": 0.006152
+        },
+        {
+          "backend": "mupdfng",
+          "phase": "revisit",
+          "cache": "hit",
+          "n": 420,
+          "median": 0.00036,
+          "min": 0.00032,
+          "max": 0.001112,
+          "p95": 0.000772
+        },
+        {
+          "backend": "mupdfng",
+          "phase": "sequential",
+          "cache": "miss",
+          "n": 390,
+          "median": 99.70861350000001,
+          "min": 43.644405,
+          "max": 1008.10871,
+          "p95": 941.003409
+        },
+        {
+          "backend": "poppler",
+          "phase": "first_page",
+          "cache": "miss",
+          "n": 30,
+          "median": 613.618284,
+          "min": 608.382478,
+          "max": 668.127436,
+          "p95": 666.439172
+        },
+        {
+          "backend": "poppler",
+          "phase": "random",
+          "cache": "hit",
+          "n": 420,
+          "median": 0.0004305,
+          "min": 0.00032,
+          "max": 0.036418,
+          "p95": 0.005771
+        },
+        {
+          "backend": "poppler",
+          "phase": "revisit",
+          "cache": "hit",
+          "n": 420,
+          "median": 0.0004055,
+          "min": 0.00032,
+          "max": 0.034575,
+          "p95": 0.000471
+        },
+        {
+          "backend": "poppler",
+          "phase": "sequential",
+          "cache": "miss",
+          "n": 390,
+          "median": 236.68453,
+          "min": 73.777509,
+          "max": 2692.278148,
+          "p95": 2612.180693
+        }
+      ]
+    },
+    {
+      "id": "2609.09123v1",
+      "title": "Mask Forcing: Improving Autoregressive Video Diffusion Distillation via Dual-Noise Masking Rollout",
+      "pages": 24,
+      "ratios": {
+        "render_ms": {
+          "n": 30,
+          "median": 1.8461922253453569,
+          "min": 1.8164040318686856,
+          "max": 1.8867937775297046,
+          "p95": 1.8669321481724608,
+          "ci95": [
+            1.8293556049226651,
+            1.8510147782407387
+          ]
+        },
+        "open_ms": {
+          "n": 30,
+          "median": 0.29605708730574654,
+          "min": 0.2857496200117034,
+          "max": 0.30465647174804406,
+          "p95": 0.3043432607166577,
+          "ci95": [
+            0.2938934507379631,
+            0.29740335713795285
+          ]
+        },
+        "open_to_first_page_ms": {
+          "n": 30,
+          "median": 0.7334537536052649,
+          "min": 0.69252106994081,
+          "max": 0.9513768326113721,
+          "p95": 0.9513293688555856,
+          "ci95": [
+            0.7176593448973401,
+            0.7420344243593746
+          ]
+        }
+      },
+      "timings": {
+        "mupdfng": {
+          "render_ms": {
+            "n": 30,
+            "median": 2819.5761765,
+            "min": 2804.606079,
+            "max": 2877.699024,
+            "p95": 2859.618833
+          },
+          "open_ms": {
+            "n": 30,
+            "median": 24.41374,
+            "min": 23.922268,
+            "max": 25.448709,
+            "p95": 25.226102
+          },
+          "open_to_first_page_ms": {
+            "n": 30,
+            "median": 62.141775499999994,
+            "min": 60.157657,
+            "max": 64.748727,
+            "p95": 64.651553
+          }
+        },
+        "poppler": {
+          "render_ms": {
+            "n": 30,
+            "median": 5215.272172999999,
+            "min": 5127.989476,
+            "max": 5303.704535,
+            "p95": 5273.111493
+          },
+          "open_ms": {
+            "n": 30,
+            "median": 7.2001035,
+            "min": 7.05423,
+            "max": 7.493743,
+            "p95": 7.426067
+          },
+          "open_to_first_page_ms": {
+            "n": 30,
+            "median": 45.475460999999996,
+            "min": 44.358198,
+            "max": 59.148422,
+            "p95": 58.118004
+          }
+        }
+      },
+      "requests": [
+        {
+          "backend": "mupdfng",
+          "phase": "first_page",
+          "cache": "miss",
+          "n": 30,
+          "median": 37.6381945,
+          "min": 35.926897,
+          "max": 39.654467,
+          "p95": 39.626665
+        },
+        {
+          "backend": "mupdfng",
+          "phase": "random",
+          "cache": "hit",
+          "n": 537,
+          "median": 0.000571,
+          "min": 0.00032,
+          "max": 0.01074,
+          "p95": 0.007173
+        },
+        {
+          "backend": "mupdfng",
+          "phase": "random",
+          "cache": "miss",
+          "n": 63,
+          "median": 235.417144,
+          "min": 23.96649,
+          "max": 283.761436,
+          "p95": 264.739477
+        },
+        {
+          "backend": "mupdfng",
+          "phase": "revisit",
+          "cache": "hit",
+          "n": 600,
+          "median": 0.00036,
+          "min": 0.00032,
+          "max": 0.022181,
+          "p95": 0.000822
+        },
+        {
+          "backend": "mupdfng",
+          "phase": "sequential",
+          "cache": "miss",
+          "n": 570,
+          "median": 24.219607500000002,
+          "min": 15.160343,
+          "max": 1692.496839,
+          "p95": 1635.808441
+        },
+        {
+          "backend": "poppler",
+          "phase": "first_page",
+          "cache": "miss",
+          "n": 30,
+          "median": 38.192575500000004,
+          "min": 37.068792,
+          "max": 51.885532,
+          "p95": 50.691027
+        },
+        {
+          "backend": "poppler",
+          "phase": "random",
+          "cache": "hit",
+          "n": 537,
+          "median": 0.000621,
+          "min": 0.00032,
+          "max": 0.11661,
+          "p95": 0.006873
+        },
+        {
+          "backend": "poppler",
+          "phase": "random",
+          "cache": "miss",
+          "n": 63,
+          "median": 1062.670742,
+          "min": 23.973751,
+          "max": 1380.546304,
+          "p95": 1340.533601
+        },
+        {
+          "backend": "poppler",
+          "phase": "revisit",
+          "cache": "hit",
+          "n": 600,
+          "median": 0.000391,
+          "min": 0.00032,
+          "max": 0.005841,
+          "p95": 0.000722
+        },
+        {
+          "backend": "poppler",
+          "phase": "sequential",
+          "cache": "miss",
+          "n": 570,
+          "median": 44.0085655,
+          "min": 26.437857,
+          "max": 1782.470523,
+          "p95": 1662.615524
+        }
+      ]
+    },
+    {
+      "id": "2610.26067v1",
+      "title": "PhysSkin++: Real-Time and Generalizable Physics-Based Animation via Self-Supervised Neural Skinning",
+      "pages": 16,
+      "ratios": {
+        "render_ms": {
+          "n": 30,
+          "median": 4.077770045913608,
+          "min": 3.9734162928576615,
+          "max": 4.153617393191114,
+          "p95": 4.140192965833898,
+          "ci95": [
+            4.0711768354499736,
+            4.09773609794172
+          ]
+        },
+        "open_ms": {
+          "n": 30,
+          "median": 0.30968268765984,
+          "min": 0.26313858944229096,
+          "max": 0.32733319233676067,
+          "p95": 0.3251164309335066,
+          "ci95": [
+            0.30437893100985586,
+            0.3144837450295681
+          ]
+        },
+        "open_to_first_page_ms": {
+          "n": 30,
+          "median": 0.7921740981493968,
+          "min": 0.7400446402740151,
+          "max": 0.9754983938052191,
+          "p95": 0.8613555425469694,
+          "ci95": [
+            0.7790312684678531,
+            0.8100268424818575
+          ]
+        }
+      },
+      "timings": {
+        "mupdfng": {
+          "render_ms": {
+            "n": 30,
+            "median": 3250.0564830000003,
+            "min": 3205.561954,
+            "max": 3335.212148,
+            "p95": 3322.655867
+          },
+          "open_ms": {
+            "n": 30,
+            "median": 25.934403,
+            "min": 24.37926,
+            "max": 30.155349,
+            "p95": 28.626158
+          },
+          "open_to_first_page_ms": {
+            "n": 30,
+            "median": 79.24591649999999,
+            "min": 75.311646,
+            "max": 83.162427,
+            "p95": 82.904061
+          }
+        },
+        "poppler": {
+          "render_ms": {
+            "n": 30,
+            "median": 13281.083564,
+            "min": 13181.412816,
+            "max": 13654.755307,
+            "p95": 13406.828152
+          },
+          "open_ms": {
+            "n": 30,
+            "median": 7.9439885,
+            "min": 7.776271,
+            "max": 8.36957,
+            "p95": 8.302521
+          },
+          "open_to_first_page_ms": {
+            "n": 30,
+            "median": 62.38042,
+            "min": 60.60532,
+            "max": 77.187123,
+            "p95": 68.22436
+          }
+        }
+      },
+      "requests": [
+        {
+          "backend": "mupdfng",
+          "phase": "first_page",
+          "cache": "miss",
+          "n": 30,
+          "median": 53.314499999999995,
+          "min": 50.003901,
+          "max": 55.944619,
+          "p95": 54.771678
+        },
+        {
+          "backend": "mupdfng",
+          "phase": "random",
+          "cache": "hit",
+          "n": 480,
+          "median": 0.000651,
+          "min": 0.000311,
+          "max": 0.011461,
+          "p95": 0.00517
+        },
+        {
+          "backend": "mupdfng",
+          "phase": "revisit",
+          "cache": "hit",
+          "n": 480,
+          "median": 0.0003455,
+          "min": 0.00031,
+          "max": 0.001183,
+          "p95": 0.000751
+        },
+        {
+          "backend": "mupdfng",
+          "phase": "sequential",
+          "cache": "miss",
+          "n": 450,
+          "median": 111.838874,
+          "min": 26.437833,
+          "max": 835.736993,
+          "p95": 782.874372
+        },
+        {
+          "backend": "poppler",
+          "phase": "first_page",
+          "cache": "miss",
+          "n": 30,
+          "median": 54.4586725,
+          "min": 52.718798,
+          "max": 68.789815,
+          "p95": 60.291074
+        },
+        {
+          "backend": "poppler",
+          "phase": "random",
+          "cache": "hit",
+          "n": 480,
+          "median": 0.000411,
+          "min": 0.00032,
+          "max": 0.03184,
+          "p95": 0.005159
+        },
+        {
+          "backend": "poppler",
+          "phase": "revisit",
+          "cache": "hit",
+          "n": 480,
+          "median": 0.000371,
+          "min": 0.000311,
+          "max": 0.031298,
+          "p95": 0.000481
+        },
+        {
+          "backend": "poppler",
+          "phase": "sequential",
+          "cache": "miss",
+          "n": 450,
+          "median": 454.381643,
+          "min": 49.199284,
+          "max": 4300.206232,
+          "p95": 3904.431311
+        }
+      ]
+    },
+    {
+      "id": "2312.00752v2",
+      "title": "Mamba: Linear-Time Sequence Modeling with Selective State Spaces",
+      "pages": 36,
+      "ratios": {
+        "render_ms": {
+          "n": 30,
+          "median": 1.7321319574914409,
+          "min": 1.5969582480950644,
+          "max": 1.8467178617522173,
+          "p95": 1.8008626660356022,
+          "ci95": [
+            1.7053118308413224,
+            1.7455375869095717
+          ]
+        },
+        "open_ms": {
+          "n": 30,
+          "median": 0.33550126287953985,
+          "min": 0.10320862553476395,
+          "max": 0.3875880442093371,
+          "p95": 0.3528567262071744,
+          "ci95": [
+            0.32629857522509176,
+            0.34218575140263874
+          ]
+        },
+        "open_to_first_page_ms": {
+          "n": 30,
+          "median": 0.6724352587127884,
+          "min": 0.4671128545811705,
+          "max": 0.7292230263620463,
+          "p95": 0.7189833820060421,
+          "ci95": [
+            0.6671896067237817,
+            0.6862968418565341
+          ]
+        }
+      },
+      "timings": {
+        "mupdfng": {
+          "render_ms": {
+            "n": 30,
+            "median": 754.4322784999999,
+            "min": 717.399752,
+            "max": 844.251563,
+            "p95": 783.693091
+          },
+          "open_ms": {
+            "n": 30,
+            "median": 23.3718665,
+            "min": 21.573436,
+            "max": 74.204234,
+            "p95": 32.349657
+          },
+          "open_to_first_page_ms": {
+            "n": 30,
+            "median": 117.357527,
+            "min": 111.275655,
+            "max": 169.123511,
+            "p95": 124.128095
+          }
+        },
+        "poppler": {
+          "render_ms": {
+            "n": 30,
+            "median": 1297.16659,
+            "min": 1278.319912,
+            "max": 1370.829047,
+            "p95": 1348.234497
+          },
+          "open_ms": {
+            "n": 30,
+            "median": 7.739742,
+            "min": 7.483498,
+            "max": 9.565371,
+            "p95": 8.517401
+          },
+          "open_to_first_page_ms": {
+            "n": 30,
+            "median": 78.7545795,
+            "min": 76.993457,
+            "max": 86.425612,
+            "p95": 85.246072
+          }
+        }
+      },
+      "requests": [
+        {
+          "backend": "mupdfng",
+          "phase": "first_page",
+          "cache": "miss",
+          "n": 30,
+          "median": 93.707344,
+          "min": 89.642788,
+          "max": 96.886409,
+          "p95": 96.798919
+        },
+        {
+          "backend": "mupdfng",
+          "phase": "random",
+          "cache": "hit",
+          "n": 409,
+          "median": 0.000822,
+          "min": 0.00033,
+          "max": 0.02653,
+          "p95": 0.008566
+        },
+        {
+          "backend": "mupdfng",
+          "phase": "random",
+          "cache": "miss",
+          "n": 191,
+          "median": 30.709281,
+          "min": 17.608636,
+          "max": 50.189012,
+          "p95": 36.963717
+        },
+        {
+          "backend": "mupdfng",
+          "phase": "revisit",
+          "cache": "hit",
+          "n": 600,
+          "median": 0.00043,
+          "min": 0.00032,
+          "max": 0.009588,
+          "p95": 0.000891
+        },
+        {
+          "backend": "mupdfng",
+          "phase": "sequential",
+          "cache": "miss",
+          "n": 570,
+          "median": 34.2718095,
+          "min": 26.423494,
+          "max": 58.764832,
+          "p95": 42.930004
+        },
+        {
+          "backend": "poppler",
+          "phase": "first_page",
+          "cache": "miss",
+          "n": 30,
+          "median": 70.895945,
+          "min": 69.281422,
+          "max": 78.467504,
+          "p95": 77.396506
+        },
+        {
+          "backend": "poppler",
+          "phase": "random",
+          "cache": "hit",
+          "n": 409,
+          "median": 0.000702,
+          "min": 0.000321,
+          "max": 0.041577,
+          "p95": 0.008346
+        },
+        {
+          "backend": "poppler",
+          "phase": "random",
+          "cache": "miss",
+          "n": 191,
+          "median": 57.136809,
+          "min": 20.043544,
+          "max": 78.600882,
+          "p95": 71.302938
+        },
+        {
+          "backend": "poppler",
+          "phase": "revisit",
+          "cache": "hit",
+          "n": 600,
+          "median": 0.000421,
+          "min": 0.000321,
+          "max": 0.064941,
+          "p95": 0.000811
+        },
+        {
+          "backend": "poppler",
+          "phase": "sequential",
+          "cache": "miss",
+          "n": 570,
+          "median": 65.1175705,
+          "min": 54.495502,
+          "max": 104.437169,
+          "p95": 72.345687
+        }
+      ]
+    },
+    {
+      "id": "2307.03109v9",
+      "title": "A Survey on Evaluation of Large Language Models",
+      "pages": 45,
+      "ratios": {
+        "render_ms": {
+          "n": 30,
+          "median": 1.688982109426441,
+          "min": 1.6127262113461134,
+          "max": 1.8479332774527362,
+          "p95": 1.7984680475619421,
+          "ci95": [
+            1.6624698190812257,
+            1.7185469464588683
+          ]
+        },
+        "open_ms": {
+          "n": 30,
+          "median": 0.44702962292190684,
+          "min": 0.34398408690575855,
+          "max": 0.513134569068522,
+          "p95": 0.5009153430049649,
+          "ci95": [
+            0.43805815875728016,
+            0.45775513797316025
+          ]
+        },
+        "open_to_first_page_ms": {
+          "n": 30,
+          "median": 0.8781329851406031,
+          "min": 0.8058972077711022,
+          "max": 0.9371775932429005,
+          "p95": 0.9204112211076969,
+          "ci95": [
+            0.870495036512771,
+            0.8843912138457114
+          ]
+        }
+      },
+      "timings": {
+        "mupdfng": {
+          "render_ms": {
+            "n": 30,
+            "median": 678.237865,
+            "min": 644.978014,
+            "max": 731.704027,
+            "p95": 719.20522
+          },
+          "open_ms": {
+            "n": 30,
+            "median": 29.165647999999997,
+            "min": 27.538108,
+            "max": 38.081343,
+            "p95": 31.2
+          },
+          "open_to_first_page_ms": {
+            "n": 30,
+            "median": 93.158136,
+            "min": 89.433444,
+            "max": 107.695612,
+            "p95": 96.567658
+          }
+        },
+        "poppler": {
+          "render_ms": {
+            "n": 30,
+            "median": 1145.3475389999999,
+            "min": 1123.045126,
+            "max": 1205.588016,
+            "p95": 1196.633141
+          },
+          "open_ms": {
+            "n": 30,
+            "median": 13.0003315,
+            "min": 12.779772,
+            "max": 14.38455,
+            "p95": 14.075919
+          },
+          "open_to_first_page_ms": {
+            "n": 30,
+            "median": 81.070865,
+            "min": 79.93489,
+            "max": 87.840027,
+            "p95": 86.791593
+          }
+        }
+      },
+      "requests": [
+        {
+          "backend": "mupdfng",
+          "phase": "first_page",
+          "cache": "miss",
+          "n": 30,
+          "median": 63.75058,
+          "min": 60.753407,
+          "max": 69.529011,
+          "p95": 65.993877
+        },
+        {
+          "backend": "mupdfng",
+          "phase": "random",
+          "cache": "hit",
+          "n": 351,
+          "median": 0.000892,
+          "min": 0.00033,
+          "max": 0.028503,
+          "p95": 0.008366
+        },
+        {
+          "backend": "mupdfng",
+          "phase": "random",
+          "cache": "miss",
+          "n": 249,
+          "median": 34.219525,
+          "min": 23.508887,
+          "max": 58.236966,
+          "p95": 44.934936
+        },
+        {
+          "backend": "mupdfng",
+          "phase": "revisit",
+          "cache": "hit",
+          "n": 600,
+          "median": 0.000591,
+          "min": 0.00031,
+          "max": 0.031178,
+          "p95": 0.000912
+        },
+        {
+          "backend": "mupdfng",
+          "phase": "sequential",
+          "cache": "miss",
+          "n": 570,
+          "median": 29.531402,
+          "min": 24.754145,
+          "max": 73.864183,
+          "p95": 61.53906
+        },
+        {
+          "backend": "poppler",
+          "phase": "first_page",
+          "cache": "miss",
+          "n": 30,
+          "median": 67.793605,
+          "min": 66.856463,
+          "max": 73.933361,
+          "p95": 73.612959
+        },
+        {
+          "backend": "poppler",
+          "phase": "random",
+          "cache": "hit",
+          "n": 351,
+          "median": 0.000811,
+          "min": 0.000321,
+          "max": 0.045916,
+          "p95": 0.008266
+        },
+        {
+          "backend": "poppler",
+          "phase": "random",
+          "cache": "miss",
+          "n": 249,
+          "median": 61.68677,
+          "min": 48.10877,
+          "max": 77.235425,
+          "p95": 68.842004
+        },
+        {
+          "backend": "poppler",
+          "phase": "revisit",
+          "cache": "hit",
+          "n": 600,
+          "median": 0.000601,
+          "min": 0.000311,
+          "max": 0.01042,
+          "p95": 0.000791
+        },
+        {
+          "backend": "poppler",
+          "phase": "sequential",
+          "cache": "miss",
+          "n": 570,
+          "median": 57.9345735,
+          "min": 39.577257,
+          "max": 90.106244,
+          "p95": 73.956239
+        }
+      ]
+    }
+  ],
+  "trials": 300,
+  "warnings": [
+    {
+      "document": "2609.00625v1",
+      "backend": "mupdfng",
+      "trial": 1,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2609.00625v1",
+      "backend": "mupdfng",
+      "trial": 2,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2609.00625v1",
+      "backend": "mupdfng",
+      "trial": 3,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2609.00625v1",
+      "backend": "mupdfng",
+      "trial": 4,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2609.00625v1",
+      "backend": "mupdfng",
+      "trial": 5,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2609.00625v1",
+      "backend": "mupdfng",
+      "trial": 6,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2609.00625v1",
+      "backend": "mupdfng",
+      "trial": 7,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2609.00625v1",
+      "backend": "mupdfng",
+      "trial": 8,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2609.00625v1",
+      "backend": "mupdfng",
+      "trial": 9,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2609.00625v1",
+      "backend": "mupdfng",
+      "trial": 10,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2609.00625v1",
+      "backend": "mupdfng",
+      "trial": 11,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2609.00625v1",
+      "backend": "mupdfng",
+      "trial": 12,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2609.00625v1",
+      "backend": "mupdfng",
+      "trial": 13,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2609.00625v1",
+      "backend": "mupdfng",
+      "trial": 14,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2609.00625v1",
+      "backend": "mupdfng",
+      "trial": 15,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2609.00625v1",
+      "backend": "mupdfng",
+      "trial": 16,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2609.00625v1",
+      "backend": "mupdfng",
+      "trial": 17,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2609.00625v1",
+      "backend": "mupdfng",
+      "trial": 18,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2609.00625v1",
+      "backend": "mupdfng",
+      "trial": 19,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2609.00625v1",
+      "backend": "mupdfng",
+      "trial": 20,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2609.00625v1",
+      "backend": "mupdfng",
+      "trial": 21,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2609.00625v1",
+      "backend": "mupdfng",
+      "trial": 22,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2609.00625v1",
+      "backend": "mupdfng",
+      "trial": 23,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2609.00625v1",
+      "backend": "mupdfng",
+      "trial": 24,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2609.00625v1",
+      "backend": "mupdfng",
+      "trial": 25,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2609.00625v1",
+      "backend": "mupdfng",
+      "trial": 26,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2609.00625v1",
+      "backend": "mupdfng",
+      "trial": 27,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2609.00625v1",
+      "backend": "mupdfng",
+      "trial": 28,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2609.00625v1",
+      "backend": "mupdfng",
+      "trial": 29,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2609.00625v1",
+      "backend": "mupdfng",
+      "trial": 30,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2609.09123v1",
+      "backend": "mupdfng",
+      "trial": 1,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2609.09123v1",
+      "backend": "mupdfng",
+      "trial": 2,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2609.09123v1",
+      "backend": "mupdfng",
+      "trial": 3,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2609.09123v1",
+      "backend": "mupdfng",
+      "trial": 4,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2609.09123v1",
+      "backend": "mupdfng",
+      "trial": 5,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2609.09123v1",
+      "backend": "mupdfng",
+      "trial": 6,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2609.09123v1",
+      "backend": "mupdfng",
+      "trial": 7,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2609.09123v1",
+      "backend": "mupdfng",
+      "trial": 8,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2609.09123v1",
+      "backend": "mupdfng",
+      "trial": 9,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2609.09123v1",
+      "backend": "mupdfng",
+      "trial": 10,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2609.09123v1",
+      "backend": "mupdfng",
+      "trial": 11,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2609.09123v1",
+      "backend": "mupdfng",
+      "trial": 12,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2609.09123v1",
+      "backend": "mupdfng",
+      "trial": 13,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2609.09123v1",
+      "backend": "mupdfng",
+      "trial": 14,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2609.09123v1",
+      "backend": "mupdfng",
+      "trial": 15,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2609.09123v1",
+      "backend": "mupdfng",
+      "trial": 16,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2609.09123v1",
+      "backend": "mupdfng",
+      "trial": 17,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2609.09123v1",
+      "backend": "mupdfng",
+      "trial": 18,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2609.09123v1",
+      "backend": "mupdfng",
+      "trial": 19,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2609.09123v1",
+      "backend": "mupdfng",
+      "trial": 20,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2609.09123v1",
+      "backend": "mupdfng",
+      "trial": 21,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2609.09123v1",
+      "backend": "mupdfng",
+      "trial": 22,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2609.09123v1",
+      "backend": "mupdfng",
+      "trial": 23,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2609.09123v1",
+      "backend": "mupdfng",
+      "trial": 24,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2609.09123v1",
+      "backend": "mupdfng",
+      "trial": 25,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2609.09123v1",
+      "backend": "mupdfng",
+      "trial": 26,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2609.09123v1",
+      "backend": "mupdfng",
+      "trial": 27,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2609.09123v1",
+      "backend": "mupdfng",
+      "trial": 28,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2609.09123v1",
+      "backend": "mupdfng",
+      "trial": 29,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2609.09123v1",
+      "backend": "mupdfng",
+      "trial": 30,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2610.26067v1",
+      "backend": "mupdfng",
+      "trial": 1,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2610.26067v1",
+      "backend": "mupdfng",
+      "trial": 2,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2610.26067v1",
+      "backend": "mupdfng",
+      "trial": 3,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2610.26067v1",
+      "backend": "mupdfng",
+      "trial": 4,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2610.26067v1",
+      "backend": "mupdfng",
+      "trial": 5,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2610.26067v1",
+      "backend": "mupdfng",
+      "trial": 6,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2610.26067v1",
+      "backend": "mupdfng",
+      "trial": 7,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2610.26067v1",
+      "backend": "mupdfng",
+      "trial": 8,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2610.26067v1",
+      "backend": "mupdfng",
+      "trial": 9,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2610.26067v1",
+      "backend": "mupdfng",
+      "trial": 10,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2610.26067v1",
+      "backend": "mupdfng",
+      "trial": 11,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2610.26067v1",
+      "backend": "mupdfng",
+      "trial": 12,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2610.26067v1",
+      "backend": "mupdfng",
+      "trial": 13,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2610.26067v1",
+      "backend": "mupdfng",
+      "trial": 14,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2610.26067v1",
+      "backend": "mupdfng",
+      "trial": 15,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2610.26067v1",
+      "backend": "mupdfng",
+      "trial": 16,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2610.26067v1",
+      "backend": "mupdfng",
+      "trial": 17,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2610.26067v1",
+      "backend": "mupdfng",
+      "trial": 18,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2610.26067v1",
+      "backend": "mupdfng",
+      "trial": 19,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2610.26067v1",
+      "backend": "mupdfng",
+      "trial": 20,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2610.26067v1",
+      "backend": "mupdfng",
+      "trial": 21,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2610.26067v1",
+      "backend": "mupdfng",
+      "trial": 22,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2610.26067v1",
+      "backend": "mupdfng",
+      "trial": 23,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2610.26067v1",
+      "backend": "mupdfng",
+      "trial": 24,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2610.26067v1",
+      "backend": "mupdfng",
+      "trial": 25,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2610.26067v1",
+      "backend": "mupdfng",
+      "trial": 26,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2610.26067v1",
+      "backend": "mupdfng",
+      "trial": 27,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2610.26067v1",
+      "backend": "mupdfng",
+      "trial": 28,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2610.26067v1",
+      "backend": "mupdfng",
+      "trial": 29,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2610.26067v1",
+      "backend": "mupdfng",
+      "trial": 30,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2312.00752v2",
+      "backend": "mupdfng",
+      "trial": 1,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2312.00752v2",
+      "backend": "mupdfng",
+      "trial": 2,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2312.00752v2",
+      "backend": "mupdfng",
+      "trial": 3,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2312.00752v2",
+      "backend": "mupdfng",
+      "trial": 4,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2312.00752v2",
+      "backend": "mupdfng",
+      "trial": 5,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2312.00752v2",
+      "backend": "mupdfng",
+      "trial": 6,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2312.00752v2",
+      "backend": "mupdfng",
+      "trial": 7,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2312.00752v2",
+      "backend": "mupdfng",
+      "trial": 8,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2312.00752v2",
+      "backend": "mupdfng",
+      "trial": 9,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2312.00752v2",
+      "backend": "mupdfng",
+      "trial": 10,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2312.00752v2",
+      "backend": "mupdfng",
+      "trial": 11,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2312.00752v2",
+      "backend": "mupdfng",
+      "trial": 12,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2312.00752v2",
+      "backend": "mupdfng",
+      "trial": 13,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2312.00752v2",
+      "backend": "mupdfng",
+      "trial": 14,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2312.00752v2",
+      "backend": "mupdfng",
+      "trial": 15,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2312.00752v2",
+      "backend": "mupdfng",
+      "trial": 16,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2312.00752v2",
+      "backend": "mupdfng",
+      "trial": 17,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2312.00752v2",
+      "backend": "mupdfng",
+      "trial": 18,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2312.00752v2",
+      "backend": "mupdfng",
+      "trial": 19,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2312.00752v2",
+      "backend": "mupdfng",
+      "trial": 20,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2312.00752v2",
+      "backend": "mupdfng",
+      "trial": 21,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2312.00752v2",
+      "backend": "mupdfng",
+      "trial": 22,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2312.00752v2",
+      "backend": "mupdfng",
+      "trial": 23,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2312.00752v2",
+      "backend": "mupdfng",
+      "trial": 24,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2312.00752v2",
+      "backend": "mupdfng",
+      "trial": 25,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2312.00752v2",
+      "backend": "mupdfng",
+      "trial": 26,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2312.00752v2",
+      "backend": "mupdfng",
+      "trial": 27,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2312.00752v2",
+      "backend": "mupdfng",
+      "trial": 28,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2312.00752v2",
+      "backend": "mupdfng",
+      "trial": 29,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2312.00752v2",
+      "backend": "mupdfng",
+      "trial": 30,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2307.03109v9",
+      "backend": "mupdfng",
+      "trial": 1,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2307.03109v9",
+      "backend": "mupdfng",
+      "trial": 2,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2307.03109v9",
+      "backend": "mupdfng",
+      "trial": 3,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2307.03109v9",
+      "backend": "mupdfng",
+      "trial": 4,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2307.03109v9",
+      "backend": "mupdfng",
+      "trial": 5,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2307.03109v9",
+      "backend": "mupdfng",
+      "trial": 6,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2307.03109v9",
+      "backend": "mupdfng",
+      "trial": 7,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2307.03109v9",
+      "backend": "mupdfng",
+      "trial": 8,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2307.03109v9",
+      "backend": "mupdfng",
+      "trial": 9,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2307.03109v9",
+      "backend": "mupdfng",
+      "trial": 10,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2307.03109v9",
+      "backend": "mupdfng",
+      "trial": 11,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2307.03109v9",
+      "backend": "mupdfng",
+      "trial": 12,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2307.03109v9",
+      "backend": "mupdfng",
+      "trial": 13,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2307.03109v9",
+      "backend": "mupdfng",
+      "trial": 14,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2307.03109v9",
+      "backend": "mupdfng",
+      "trial": 15,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2307.03109v9",
+      "backend": "mupdfng",
+      "trial": 16,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2307.03109v9",
+      "backend": "mupdfng",
+      "trial": 17,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2307.03109v9",
+      "backend": "mupdfng",
+      "trial": 18,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2307.03109v9",
+      "backend": "mupdfng",
+      "trial": 19,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2307.03109v9",
+      "backend": "mupdfng",
+      "trial": 20,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2307.03109v9",
+      "backend": "mupdfng",
+      "trial": 21,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2307.03109v9",
+      "backend": "mupdfng",
+      "trial": 22,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2307.03109v9",
+      "backend": "mupdfng",
+      "trial": 23,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2307.03109v9",
+      "backend": "mupdfng",
+      "trial": 24,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2307.03109v9",
+      "backend": "mupdfng",
+      "trial": 25,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2307.03109v9",
+      "backend": "mupdfng",
+      "trial": 26,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2307.03109v9",
+      "backend": "mupdfng",
+      "trial": 27,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2307.03109v9",
+      "backend": "mupdfng",
+      "trial": 28,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2307.03109v9",
+      "backend": "mupdfng",
+      "trial": 29,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    },
+    {
+      "document": "2307.03109v9",
+      "backend": "mupdfng",
+      "trial": 30,
+      "messages": [
+        "[WARN] The MuPDF worker is partially hardened: Okular's protection is limited."
+      ]
+    }
+  ]
+}

@@ -52,7 +52,7 @@ jobs:
             base-devel ca-certificates clang llvm cmake extra-cmake-modules git \
             brotli freetype2 libjpeg-turbo nss libseccomp mold openssl \
             kconfig kconfigwidgets kcoreaddons ki18n kio kxmlgui kwidgetsaddons \
-            ninja okular poppler-qt6 python qt6-base tesseract-data-eng zlib
+            ninja okular poppler-qt6 python qt6-base tesseract-data-eng zlib rust
 
       - name: Checkout benchmark and corpus
         uses: actions/checkout@v7

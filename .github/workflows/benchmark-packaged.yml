@@ -1,0 +1,160 @@
+name: Packaged MuPDF-NG vs PDFium benchmark
+
+on:
+  workflow_dispatch:
+    inputs:
+      pdfium_ref:
+        description: PDFium backend branch, tag, or full commit hash
+        type: string
+        default: main
+      repeats:
+        description: Paired trials per PDF (even number, 20–100)
+        type: number
+        default: 30
+
+permissions:
+  contents: write
+
+concurrency:
+  group: backend-benchmark-results
+  cancel-in-progress: false
+
+jobs:
+  benchmark:
+    if: github.repository == 'l4rzy/okular-backends-benchmark' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-26.04
+    timeout-minutes: 60
+    container:
+      image: archlinux:latest
+    defaults:
+      run:
+        shell: bash
+    env:
+      BENCH_CONTAINER_IMAGE: archlinux:latest
+      UV_LINK_MODE: copy
+      REPEATS: ${{ inputs.repeats || 30 }}
+      QT_QPA_PLATFORM: offscreen
+      QT_QPA_PLATFORMTHEME: generic
+
+    steps:
+      - name: Set temporary paths
+        run: |
+          echo "RESULTS_DIR=$RUNNER_TEMP/benchmark-results" >> "$GITHUB_ENV"
+          echo "RUN_DIR=$RUNNER_TEMP/benchmark-run" >> "$GITHUB_ENV"
+          echo "MPLCONFIGDIR=$RUNNER_TEMP/matplotlib" >> "$GITHUB_ENV"
+
+      - name: Upgrade Arch and install benchmark dependencies
+        run: |
+          pacman -Sy --noconfirm archlinux-keyring
+          pacman -Syu --noconfirm --needed \
+            base-devel ca-certificates clang cmake curl extra-cmake-modules git \
+            gnupg ninja okular python qt6-base tesseract-data-eng
+
+      - name: Install packaged MuPDF-NG from home_23ro_Arch
+        run: |
+          key=$(curl -fsSL "https://download.opensuse.org/repositories/home:23ro/Arch/$(uname -m)/home_23ro_Arch.key")
+          fingerprint=$(gpg --quiet --with-colons --import-options show-only --import --fingerprint <<< "${key}" | awk -F: '$1 == "fpr" && !seen++ { print $10 }')
+          test -n "$fingerprint"
+          pacman-key --init
+          pacman-key --add - <<< "${key}"
+          pacman-key --lsign-key "${fingerprint}"
+          cat >> /etc/pacman.conf <<'REPO'
+          [home_23ro_Arch]
+          Server = https://download.opensuse.org/repositories/home:/23ro/Arch/$arch
+          REPO
+          pacman -Syu --noconfirm --needed home_23ro_Arch/okular-mupdf-ng
+
+      - name: Checkout benchmark and corpus
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Checkout PDFium backend
+        uses: actions/checkout@v7
+        with:
+          repository: l4rzy/okular-backend-pdfium
+          ref: ${{ inputs.pdfium_ref || 'main' }}
+          path: pdfium-backend
+          persist-credentials: false
+
+      - name: Trust container checkout paths
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git config --global --add safe.directory "$GITHUB_WORKSPACE/pdfium-backend"
+          git -C "$GITHUB_WORKSPACE" rev-parse HEAD
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@07a047e608db84b3d8c06cd9a7c7dcc9c355c18e # v10.3.2
+        with:
+          enable-cache: false
+
+      - name: Prepare Python and report checkout
+        run: |
+          if ! [[ "$REPEATS" =~ ^([2-9][02468]|100)$ ]]; then
+            echo '::error::repeats must be an even integer between 20 and 100.'
+            exit 1
+          fi
+          uv sync --project bench --locked
+          git clone --depth 1 --branch main https://github.com/l4rzy/okular-backends-benchmark.git "$RESULTS_DIR"
+          mkdir -p "$RUN_DIR"
+          cp corpus/manifest.json "$RUN_DIR/corpus-manifest.json"
+          git rev-parse HEAD > "$RUN_DIR/benchmark-commit.txt"
+          pacman -Q > "$RUN_DIR/installed-packages.txt"
+          pacman -Qi okular-mupdf-ng > "$RUN_DIR/mupdf-package.txt"
+
+      - name: Build PDFium backend and benchmark harness
+        run: |
+          ./pdfium-backend/scripts/download-pdfium.sh
+          cmake -S pdfium-backend -B pdfium-backend/build -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=clang++
+          cmake --build pdfium-backend/build --parallel 4
+          cmake -S bench/pdfium -B "$RUN_DIR/pdfium-bench-build" -G Ninja -DCMAKE_BUILD_TYPE=Release
+          cmake --build "$RUN_DIR/pdfium-bench-build" --parallel 4
+
+      - name: Validate harness and reporting
+        run: |
+          "$RUN_DIR/pdfium-bench-build/okular-bench-pdfium" --help
+          uv run --project bench --locked python -m unittest discover -s bench -p 'test_*.py'
+
+      - name: Measure MuPDF-NG vs PDFium and update PDFIUM.md
+        env:
+          RUN_ID: ${{ github.run_id }}-${{ github.run_attempt }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          git -C "$RESULTS_DIR" pull --ff-only origin main
+          uv run --project bench --locked python bench/run_pdfium.py \
+            --mupdf-package okular-mupdf-ng --pdfium-source-dir pdfium-backend \
+            --harness "$RUN_DIR/pdfium-bench-build/okular-bench-pdfium" \
+            --manifest corpus/manifest.json --results-dir "$RESULTS_DIR" \
+            --run-id "$RUN_ID" --run-url "$RUN_URL" --repeats "$REPEATS" \
+            --pages 20 --width 1200 --output "$RUN_DIR/pdfium-samples.jsonl"
+          cat "$RESULTS_DIR/PDFIUM.md" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Preserve measurements and reports
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: packaged-pdf-benchmark-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ env.RUN_DIR }}/
+            ${{ env.RESULTS_DIR }}/reports-pdfium/${{ github.run_id }}-${{ github.run_attempt }}.json
+            ${{ env.RESULTS_DIR }}/pdfium-trend.svg
+            ${{ env.RESULTS_DIR }}/PDFIUM.md
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Publish results
+        env:
+          RESULTS_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ github.run_id }}-${{ github.run_attempt }}
+        run: |
+          git -C "$RESULTS_DIR" config user.name 'github-actions[bot]'
+          git -C "$RESULTS_DIR" config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git -C "$RESULTS_DIR" add PDFIUM.md pdfium-trend.svg "reports-pdfium/$RUN_ID.json"
+          git -C "$RESULTS_DIR" commit -m "bench: packaged MuPDF-NG vs PDFium ($RUN_ID)"
+          authorization=$(printf 'x-access-token:%s' "$RESULTS_TOKEN" | base64 -w0)
+          echo "::add-mask::$authorization"
+          GIT_CONFIG_COUNT=1 \
+            GIT_CONFIG_KEY_0=http.https://github.com/.extraheader \
+            GIT_CONFIG_VALUE_0="AUTHORIZATION: basic $authorization" \
+            git -C "$RESULTS_DIR" push origin HEAD:main

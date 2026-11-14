@@ -1,8 +1,10 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 import copy
+import json
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 import xml.etree.ElementTree as ET
 
 import run_pdfium
@@ -20,6 +22,64 @@ def summary():
 
 
 class TestPdfium(unittest.TestCase):
+    def test_installed_package_discovery(self):
+        with tempfile.TemporaryDirectory() as directory:
+            plugin = Path(directory) / "okularGenerator_mupdfng.so"
+            plugin.write_bytes(b"installed plugin")
+            with patch.object(run_pdfium.subprocess, "check_output", side_effect=[
+                "okular-mupdf-ng 1.2.3-1\n",
+                f"okular-mupdf-ng /usr/\nokular-mupdf-ng {plugin}\n",
+            ]):
+                discovered, metadata = run_pdfium.installed_mupdf_package("okular-mupdf-ng")
+            self.assertEqual(discovered, plugin)
+            self.assertEqual(metadata["version"], "okular-mupdf-ng 1.2.3-1")
+            self.assertEqual(metadata["plugin_sha256"], run_pdfium.common.file_hash(plugin))
+            with patch.object(run_pdfium.subprocess, "check_output", side_effect=[
+                "okular-mupdf-ng 1.2.3-1\n", "okular-mupdf-ng /usr/\n",
+            ]):
+                with self.assertRaisesRegex(ValueError, "Expected one installed"):
+                    run_pdfium.installed_mupdf_package("okular-mupdf-ng")
+
+    def test_packaged_run_without_mupdf_checkout(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            plugin = root / "okularGenerator_mupdfng.so"
+            pdfium = root / "pdfium-backend"
+            pdfium_plugin = pdfium / "build/plugins/okular_generators/okularGenerator_pdfium.so"
+            library = pdfium / "pdfium/lib/libpdfium.so"
+            harness = root / "harness"
+            for path in (plugin, pdfium_plugin, library, harness):
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_bytes(b"fixture")
+            package = {"name": "okular-mupdf-ng", "version": "okular-mupdf-ng 1.2.3-1"}
+            paper = {"id": "one", "path": root / "one.pdf", "pages": 1, "sha256": "paper"}
+
+            def trial(command, timeout):
+                backend = command[command.index("--backend") + 1]
+                return {"status": "ok", "page_count": 1, "samples": [
+                    {"phase": "first_page", "page": 0, "width": 1200, "height": 1600,
+                     "ok": True, "cached_before": False, "elapsed_ms": 2 if backend == "pdfium" else 1}]}
+
+            arguments = ["run_pdfium.py", "--mupdf-package", "okular-mupdf-ng",
+                         "--source-dir", str(root / "absent-mupdf-checkout"),
+                         "--pdfium-source-dir", str(pdfium), "--harness", str(harness),
+                         "--results-dir", str(root / "results"), "--run-id", "123-1",
+                         "--run-url", "https://example.invalid/run", "--repeats", "2",
+                         "--output", str(root / "samples.jsonl")]
+            with (patch.object(run_pdfium.sys, "argv", arguments),
+                  patch.object(run_pdfium, "installed_mupdf_package", return_value=(plugin, package)),
+                  patch.object(run_pdfium, "git_value", return_value="b" * 40) as git,
+                  patch.object(run_pdfium.common, "load_corpus", return_value=([paper], {"sha256": "corpus"})),
+                  patch.object(run_pdfium.common, "run_trial", side_effect=trial)):
+                self.assertEqual(run_pdfium.main(), 0)
+                git.assert_called_once_with(pdfium, "rev-parse", "HEAD")
+            result = json.loads((root / "results/reports-pdfium/123-1.json").read_text())
+            self.assertIsNone(result["mupdf_commit"])
+            self.assertEqual(result["mupdf_package"], package)
+            self.assertEqual(result["score"]["median"], 2)
+            self.assertIn(package["version"], (root / "results/PDFIUM.md").read_text())
+            self.assertTrue((root / "results/pdfium-trend.svg").is_file())
+
     def test_primary_render_excludes_other_phases(self):
         report = {"document_id": "one", "page_count": 2,
                   "samples": [{"phase": phase, "page": page, "ok": True,

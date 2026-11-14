@@ -36,6 +36,16 @@ def cpu_model():
     return platform.processor()
 
 
+def installed_mupdf_package(name):
+    version = subprocess.check_output(["pacman", "-Q", name], text=True).strip()
+    files = subprocess.check_output(["pacman", "-Ql", name], text=True).splitlines()
+    plugins = [Path(line.split(maxsplit=1)[1]) for line in files
+               if line.split(maxsplit=1)[1].endswith("/okularGenerator_mupdfng.so")]
+    if len(plugins) != 1 or not plugins[0].is_file():
+        raise ValueError(f"Expected one installed MuPDF-NG generator in {name}")
+    return plugins[0], {"name": name, "version": version, "plugin_sha256": common.file_hash(plugins[0])}
+
+
 def render_time(report, pages):
     if any(not sample["ok"] or not math.isfinite(sample["elapsed_ms"])
            or sample["elapsed_ms"] <= 0 for sample in report["samples"]):
@@ -110,13 +120,18 @@ def update_markdown(path, summaries, latest):
     history_rows = [START, "![MuPDF-NG vs PDFium rendering history](pdfium-trend.svg)", "",
                     "Lines group runs by CPU, PDFium library, corpus, and workload. "
                     "Intervals describe within-run variability.", "",
-                    "| Date | MuPDF-NG commit | PDFium commit | Median ratio (95% interval) | Repeats/PDF | Run |",
+                    "| Date | MuPDF-NG commit / package | PDFium commit | Median ratio (95% interval) | Repeats/PDF | Run |",
                     "|---|---|---|---:|---:|---|"]
     for summary in reversed(summaries[-50:]):
         ci = summary["score"]["ci95"]
+        if summary.get("mupdf_package"):
+            mupdf_source = summary["mupdf_package"]["version"]
+        else:
+            commit = summary["mupdf_commit"]
+            mupdf_source = f'[{commit[:12]}](https://github.com/l4rzy/okular-mupdf-ng/commit/{commit})'
         history_rows.append(
             f'| {summary["timestamp_utc"][:10]} '
-            f'| [{summary["mupdf_commit"][:12]}](https://github.com/l4rzy/okular-mupdf-ng/commit/{summary["mupdf_commit"]}) '
+            f'| {mupdf_source} '
             f'| [{summary["pdfium_commit"][:12]}](https://github.com/l4rzy/okular-backend-pdfium/commit/{summary["pdfium_commit"]}) '
             f'| {summary["score"]["median"]:.3f}× ({ci[0]:.3f}–{ci[1]:.3f}) '
             f'| {summary["configuration"]["repeats"]} | [details]({summary["run_url"]}) |')
@@ -151,6 +166,7 @@ def main():
     parser.add_argument("--source-dir", type=Path, default=ROOT.parent / "okular-mupdf-ng")
     parser.add_argument("--pdfium-source-dir", type=Path, default=ROOT.parent / "okular-backend-pdfium")
     parser.add_argument("--mupdf-plugin", type=Path)
+    parser.add_argument("--mupdf-package", help="use an installed pacman package instead of a MuPDF-NG source build")
     parser.add_argument("--pdfium-plugin", type=Path)
     parser.add_argument("--harness", type=Path, default=ROOT / "bench/pdfium/build/okular-bench-pdfium")
     parser.add_argument("--manifest", type=Path, default=ROOT / "corpus/manifest.json")
@@ -169,6 +185,14 @@ def main():
     args.pdfium_source_dir = args.pdfium_source_dir.resolve()
     mupdf_plugin = args.mupdf_plugin or (args.source_dir /
         "build-release/bin/okular_generators/okularGenerator_mupdfng.so")
+    mupdf_package = None
+    if args.mupdf_package:
+        if args.mupdf_plugin:
+            parser.error("--mupdf-package discovers the installed plugin; omit --mupdf-plugin")
+        try:
+            mupdf_plugin, mupdf_package = installed_mupdf_package(args.mupdf_package)
+        except (OSError, ValueError, subprocess.CalledProcessError) as error:
+            parser.error(str(error))
     pdfium_plugin = args.pdfium_plugin or (args.pdfium_source_dir /
         "build/plugins/okular_generators/okularGenerator_pdfium.so")
     for path in (args.harness, mupdf_plugin, pdfium_plugin):
@@ -183,7 +207,7 @@ def main():
         parser.error("repeats must be positive and even; pages and timeout positive; width must be 1..16384")
     if not 0 <= args.seed <= 2**32 - 1:
         parser.error("seed must be uint32")
-    if not (args.source_dir / "cmake/mupdf.version").is_file():
+    if not mupdf_package and not (args.source_dir / "cmake/mupdf.version").is_file():
         parser.error("--source-dir must be the okular-mupdf-ng checkout")
     pdfium_library = args.pdfium_source_dir / "pdfium/lib/libpdfium.so"
     if not pdfium_library.is_file():
@@ -193,7 +217,7 @@ def main():
     except (OSError, ValueError, KeyError, TypeError) as error:
         parser.error(str(error))
 
-    source_commit = git_value(args.source_dir, "rev-parse", "HEAD")
+    source_commit = None if mupdf_package else git_value(args.source_dir, "rev-parse", "HEAD")
     pdfium_commit = git_value(args.pdfium_source_dir, "rev-parse", "HEAD")
     rows = []
     ratios_by_document = {paper["id"]: [] for paper in papers}
@@ -225,6 +249,7 @@ def main():
                         parser.error(f'{paper["id"]}: {backend} failed: {result.get("error", "unknown error")}')
                     result.update(schema_version=1, backend=backend, trial=trial + 1,
                                   document_id=paper["id"], pdf_sha256=paper["sha256"], corpus=corpus,
+                                  mupdf_package=mupdf_package,
                                   seed=seed, plugin_sha256=common.file_hash(plugin), command=command,
                                   timestamp_utc=datetime.now(timezone.utc).isoformat())
                     pair[backend] = result
@@ -261,6 +286,7 @@ def main():
     summary = {"schema_version": 1, "run_id": args.run_id, "run_url": args.run_url,
                "timestamp_utc": datetime.now(timezone.utc).isoformat(),
                "mupdf_commit": source_commit, "pdfium_commit": pdfium_commit,
+               "mupdf_package": mupdf_package,
                "plugins": {backend: {"sha256": next(row["plugin_sha256"] for row in rows
                                                        if row["backend"] == backend)}
                            for backend in ("mupdfng", "pdfium")},

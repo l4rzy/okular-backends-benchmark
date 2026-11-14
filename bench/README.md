@@ -181,6 +181,30 @@ uv run --project bench --locked python bench/run_pdfium.py \
   --run-url https://example.invalid/run --output /tmp/pdfium-samples.jsonl
 ```
 
+## Benchmark with packaged MuPDF-NG
+
+Run the **Packaged MuPDF-NG vs PDFium benchmark** workflow
+([`benchmark-packaged.yml`](../.github/workflows/benchmark-packaged.yml)) manually
+from GitHub Actions. It imports and locally signs the `home_23ro_Arch` repository
+key, installs `home_23ro_Arch/okular-mupdf-ng`, and builds the PDFium backend and
+benchmark harness. It does not check out or build MuPDF-NG.
+
+This workflow publishes the separate PDFium chart and tables in `PDFIUM.md`.
+Packaged runs identify MuPDF-NG by its installed package version and plugin
+SHA-256, rather than a source commit. Raw trials and the installed package list
+are included in the workflow artifacts. The source-build workflow remains
+available independently; both workflows share the results publication lock.
+
+To benchmark an already installed package locally, build PDFium and the harness
+as above, then run:
+
+```sh
+uv run --project bench --locked python bench/run_pdfium.py \
+  --mupdf-package okular-mupdf-ng \
+  --results-dir /tmp/packaged-benchmark-results --run-id local-package-1 \
+  --run-url https://example.invalid/run --output /tmp/packaged-samples.jsonl
+```
+
 ## Tests
 
 ```sh

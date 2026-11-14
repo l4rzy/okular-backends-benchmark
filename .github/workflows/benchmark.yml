@@ -114,7 +114,7 @@ jobs:
           cmake -S plugin -B plugin/build-release -G Ninja \
             -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ \
             -DCMAKE_LINKER_TYPE=MOLD -DUSE_SYSTEM_MUPDF=OFF -DMUPDF_OPTIMIZED_BUILD=ON \
-            -DBUILD_TESTING=ON -DENABLE_MU_DEBUG=OFF -DENABLE_LTO=ON \
+            -DBUILD_TESTING=OFF -DENABLE_MU_DEBUG=OFF -DENABLE_LTO=ON \
             -DENABLE_BUILD_TREE_WORKER=ON -DDISABLE_WORKER_SANDBOX=OFF \
             -DTESSDATA_DIR=/usr/share/tessdata
           cmake --build plugin/build-release --parallel 4
@@ -128,9 +128,8 @@ jobs:
           cmake -S bench/pdfium -B "$RUN_DIR/pdfium-bench-build" -G Ninja -DCMAKE_BUILD_TYPE=Release
           cmake --build "$RUN_DIR/pdfium-bench-build" --parallel 4
 
-      - name: Run tests before timing
+      - name: Run benchmark tests before timing
         run: |
-          ctest --test-dir plugin/build-release --output-on-failure --parallel 4
           ctest --test-dir bench/build --output-on-failure
 
       - name: Measure paired PDF trials

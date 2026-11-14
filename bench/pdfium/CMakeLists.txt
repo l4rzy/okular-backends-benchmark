@@ -1,0 +1,20 @@
+cmake_minimum_required(VERSION 3.20)
+project(okular-backend-pdfium-bench LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+find_package(ECM 6.3 CONFIG REQUIRED)
+list(APPEND CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
+find_package(Qt6 REQUIRED COMPONENTS Core Widgets)
+find_package(Okular6 REQUIRED)
+find_package(KF6CoreAddons REQUIRED)
+find_package(KF6Config REQUIRED)
+find_path(OKULAR_CORE_INCLUDE_DIR okularcore_export.h PATH_SUFFIXES okular/core REQUIRED)
+
+add_executable(okular-bench-pdfium main.cpp)
+target_include_directories(okular-bench-pdfium PRIVATE ${OKULAR_CORE_INCLUDE_DIR})
+target_link_libraries(okular-bench-pdfium PRIVATE Qt6::Widgets Okular::Core KF6::CoreAddons KF6::ConfigCore)
+target_compile_definitions(okular-bench-pdfium PRIVATE BENCH_BUILD_TYPE="${CMAKE_BUILD_TYPE}")
+target_compile_options(okular-bench-pdfium PRIVATE -Wall -Wextra -Wpedantic -Wconversion -Wshadow)

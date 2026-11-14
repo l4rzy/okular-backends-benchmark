@@ -9,6 +9,10 @@ on:
         description: Plugin branch, tag, or full commit hash
         type: string
         default: main
+      pdfium_ref:
+        description: PDFium backend branch, tag, or full commit hash
+        type: string
+        default: main
       repeats:
         description: Paired trials per PDF (even number, 20–100)
         type: number
@@ -50,7 +54,7 @@ jobs:
           pacman -Sy --noconfirm archlinux-keyring
           pacman -Syu --noconfirm --needed \
             base-devel ca-certificates clang llvm cmake extra-cmake-modules git \
-            brotli freetype2 libjpeg-turbo nss libseccomp mold openssl \
+            brotli curl freetype2 libjpeg-turbo nss libseccomp mold openssl \
             kconfig kconfigwidgets kcoreaddons ki18n kio kxmlgui kwidgetsaddons \
             ninja okular poppler-qt6 python qt6-base tesseract-data-eng zlib rust
 
@@ -67,10 +71,19 @@ jobs:
           path: plugin
           persist-credentials: false
 
+      - name: Checkout PDFium backend
+        uses: actions/checkout@v7
+        with:
+          repository: l4rzy/okular-backend-pdfium
+          ref: ${{ inputs.pdfium_ref || 'main' }}
+          path: pdfium-backend
+          persist-credentials: false
+
       - name: Trust container checkout paths
         run: |
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
           git config --global --add safe.directory "$GITHUB_WORKSPACE/plugin"
+          git config --global --add safe.directory "$GITHUB_WORKSPACE/pdfium-backend"
           git -C "$GITHUB_WORKSPACE" rev-parse HEAD
 
       - name: Record plugin commit
@@ -105,9 +118,15 @@ jobs:
             -DENABLE_BUILD_TREE_WORKER=ON -DDISABLE_WORKER_SANDBOX=OFF \
             -DTESSDATA_DIR=/usr/share/tessdata
           cmake --build plugin/build-release --parallel 4
+          ./pdfium-backend/scripts/download-pdfium.sh
+          cmake -S pdfium-backend -B pdfium-backend/build -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=clang++
+          cmake --build pdfium-backend/build --parallel 4
           cmake -S bench -B bench/build -G Ninja -DCMAKE_BUILD_TYPE=Release \
             -DPython3_EXECUTABLE="$GITHUB_WORKSPACE/bench/.venv/bin/python"
           cmake --build bench/build --parallel 4
+          cmake -S bench/pdfium -B "$RUN_DIR/pdfium-bench-build" -G Ninja -DCMAKE_BUILD_TYPE=Release
+          cmake --build "$RUN_DIR/pdfium-bench-build" --parallel 4
 
       - name: Run tests before timing
         run: |
@@ -133,6 +152,19 @@ jobs:
             --run-id "$RUN_ID" --run-url "$RUN_URL"
           cat "$RESULTS_DIR/reports/$SOURCE_COMMIT/$RUN_ID/report.md" >> "$GITHUB_STEP_SUMMARY"
 
+      - name: Measure MuPDF-NG vs PDFium and update PDFIUM.md
+        env:
+          RUN_ID: ${{ github.run_id }}-${{ github.run_attempt }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          uv run --project bench --locked python bench/run_pdfium.py \
+            --source-dir plugin --pdfium-source-dir pdfium-backend \
+            --harness "$RUN_DIR/pdfium-bench-build/okular-bench-pdfium" \
+            --manifest corpus/manifest.json --results-dir "$RESULTS_DIR" \
+            --run-id "$RUN_ID" --run-url "$RUN_URL" --repeats "$REPEATS" \
+            --pages 20 --width 1200 --output "$RUN_DIR/pdfium-samples.jsonl"
+          cat "$RESULTS_DIR/PDFIUM.md" >> "$GITHUB_STEP_SUMMARY"
+
       - name: Preserve measurements and reports
         if: always()
         uses: actions/upload-artifact@v7
@@ -141,8 +173,11 @@ jobs:
           path: |
             ${{ env.RUN_DIR }}/
             ${{ env.RESULTS_DIR }}/reports/${{ steps.source.outputs.commit }}/${{ github.run_id }}-${{ github.run_attempt }}/
+            ${{ env.RESULTS_DIR }}/reports-pdfium/${{ github.run_id }}-${{ github.run_attempt }}.json
             ${{ env.RESULTS_DIR }}/trend.svg
+            ${{ env.RESULTS_DIR }}/pdfium-trend.svg
             ${{ env.RESULTS_DIR }}/README.md
+            ${{ env.RESULTS_DIR }}/PDFIUM.md
           if-no-files-found: warn
           retention-days: 30
 
@@ -154,7 +189,7 @@ jobs:
         run: |
           git -C "$RESULTS_DIR" config user.name 'github-actions[bot]'
           git -C "$RESULTS_DIR" config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git -C "$RESULTS_DIR" add README.md trend.svg "reports/$SOURCE_COMMIT/$RUN_ID"
+          git -C "$RESULTS_DIR" add README.md trend.svg PDFIUM.md pdfium-trend.svg "reports/$SOURCE_COMMIT/$RUN_ID" "reports-pdfium/$RUN_ID.json"
           git -C "$RESULTS_DIR" commit -m "bench: $SOURCE_COMMIT ($RUN_ID)"
           authorization=$(printf 'x-access-token:%s' "$RESULTS_TOKEN" | base64 -w0)
           echo "::add-mask::$authorization"

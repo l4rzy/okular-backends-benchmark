@@ -162,6 +162,25 @@ uv run --project bench --locked python bench/report.py \
 `--allow-dirty` permits local previews from uncommitted work; CI never uses it.
 Preview into a temporary directory rather than the published results checkout.
 
+## PDFium comparison
+
+The existing benchmark scripts and Poppler history remain independent. The
+additional `run_pdfium.py` script runs MuPDF-NG and PDFium using its own harness
+under `bench/pdfium/`, then updates the separate [`PDFIUM.md`](../PDFIUM.md)
+history chart (`pdfium-trend.svg`) and latest per-document table. CI runs this
+after the existing tests and Poppler benchmark. Build both generators in release
+mode, with MuPDF-NG's `ENABLE_MU_DEBUG=OFF`. Build the PDFium generator in
+`../okular-backend-pdfium/build`
+and the harness with:
+
+```sh
+cmake -S bench/pdfium -B bench/pdfium/build -DCMAKE_BUILD_TYPE=Release
+cmake --build bench/pdfium/build --parallel
+uv run --project bench --locked python bench/run_pdfium.py \
+  --results-dir /path/to/results-checkout --run-id local-1 \
+  --run-url https://example.invalid/run --output /tmp/pdfium-samples.jsonl
+```
+
 ## Tests
 
 ```sh

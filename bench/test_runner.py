@@ -12,6 +12,53 @@ import run
 
 
 class TestRunner(unittest.TestCase):
+    def test_package_environment_without_source_checkout(self):
+        package = {"name": "okular-mupdf-ng", "version": "okular-mupdf-ng 1.2.3-1",
+                   "plugin_sha256": "c" * 64}
+        with patch.object(run, "command_output", return_value="") as command:
+            environment = run.collect_environment({}, None, package)
+        self.assertIsNone(environment["source_commit"])
+        self.assertFalse(environment["source_dirty"])
+        self.assertEqual(environment["mupdf_package"], package)
+        self.assertEqual(environment["versions"]["mupdf"], package["version"])
+        self.assertFalse(any("None" in call.args[0] for call in command.call_args_list))
+
+    def test_packaged_runner_without_source_checkout(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            plugin = root / "mupdfng.so"
+            harness = root / "harness"
+            plugin.touch()
+            harness.touch()
+            package = {"name": "okular-mupdf-ng", "version": "okular-mupdf-ng 1.2.3-1",
+                       "plugin_sha256": run.file_hash(plugin)}
+            paper = {"id": "one", "path": root / "one.pdf", "sha256": "pdf", "pages": 1}
+            output = root / "samples.jsonl"
+            commands = []
+
+            def trial(command, timeout):
+                commands.append(command)
+                return {"status": "ok", "plugin_path": str(plugin), "pdf": str(paper["path"]),
+                        "backend": command[command.index("--backend") + 1],
+                        "open_ms": 1, "open_to_first_page_ms": 2, "samples": []}
+
+            argv = ["run.py", "--mupdf-package", "okular-mupdf-ng", "--source-dir", str(root / "absent"),
+                    "--pdfium-plugin", str(plugin),
+                    "--harness", str(harness), "--manifest", str(root / "manifest.json"),
+                    "--repeats", "2", "--output", str(output)]
+            with (patch.object(sys, "argv", argv),
+                  patch.object(run, "installed_mupdf_package", return_value=(plugin, package)),
+                  patch.object(run, "load_corpus", return_value=([paper], {})),
+                  patch.object(run, "collect_environment", return_value={"mupdf_package": package}) as environment,
+                  patch.object(run, "run_trial", side_effect=trial),
+                  patch.object(sys, "stdout", io.StringIO()), patch.object(sys, "stderr", io.StringIO())):
+                self.assertEqual(run.main(), 0)
+                environment.assert_called_once_with({}, None, package)
+            self.assertEqual([command[command.index("--backend") + 1] for command in commands],
+                             ["mupdfng", "poppler", "pdfium", "pdfium", "poppler", "mupdfng"])
+            self.assertEqual(len(output.read_text().splitlines()), 6)
+            self.assertEqual(json.loads(output.read_text().splitlines()[0])["environment"]["mupdf_package"], package)
+
     def test_source_and_benchmark_provenance_are_separate(self):
         with tempfile.TemporaryDirectory() as directory:
             source = Path(directory)
@@ -94,6 +141,13 @@ class TestRunner(unittest.TestCase):
                                 (2, ("mupdfng", "poppler"))]:
             with self.subTest(trial=trial):
                 self.assertEqual(run.backend_order(trial), expected)
+
+    def test_three_backend_order_balances_positions(self):
+        orders = [run.three_backend_order(trial) for trial in range(6)]
+        for position in range(3):
+            for backend in ("mupdfng", "poppler", "pdfium"):
+                self.assertEqual(sum(order[position] == backend for order in orders), 2)
+        self.assertEqual(run.three_backend_order(6), orders[0])
 
     def test_percentile(self):
         for values, fraction, expected in [([5], .95, 5), ([4, 1, 3, 2], .5, 2),

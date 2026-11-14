@@ -3,7 +3,7 @@
 Benchmarks comparing the **[MuPDF-NG backend](https://github.com/l4rzy/okular-mupdf-ng)** with **[Okular’s official Poppler
 backend](https://github.com/KDE/okular/tree/master/generators/poppler)**, using a versioned PDF corpus and tracking performance over time.
 
-The separate [MuPDF-NG vs PDFium history](PDFIUM.md) is measured after the existing Poppler benchmark completes. The manual [packaged MuPDF-NG workflow](.github/workflows/benchmark-packaged.yml) installs MuPDF-NG from `home_23ro_Arch` and builds PDFium for the same comparison.
+The separate [MuPDF-NG vs PDFium history](PDFIUM.md) is measured after the existing Poppler benchmark completes. The manual [packaged MuPDF-NG workflow](.github/workflows/benchmark-packaged.yml) installs MuPDF-NG from `home_23ro_Arch` and builds PDFium to benchmark against both Poppler and PDFium.
 
 <!-- benchmark-history:start -->
 ## Backend performance history

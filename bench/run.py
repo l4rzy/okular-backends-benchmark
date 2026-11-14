@@ -39,6 +39,14 @@ def backend_order(trial):
     return ("poppler", "mupdfng") if trial % 2 else ("mupdfng", "poppler")
 
 
+def three_backend_order(trial):
+    # Every backend occupies each position twice in every six trials.
+    orders = (("mupdfng", "poppler", "pdfium"), ("pdfium", "poppler", "mupdfng"),
+              ("poppler", "pdfium", "mupdfng"), ("mupdfng", "pdfium", "poppler"),
+              ("pdfium", "mupdfng", "poppler"), ("poppler", "mupdfng", "pdfium"))
+    return orders[trial % len(orders)]
+
+
 def percentile(values, fraction):
     """Nearest-rank percentile; report sample counts alongside results."""
     ordered = sorted(values)
@@ -131,7 +139,17 @@ def command_output(command):
         return "unavailable"
 
 
-def collect_environment(settings, source_dir):
+def installed_mupdf_package(name):
+    version = subprocess.check_output(["pacman", "-Q", name], text=True).strip()
+    files = subprocess.check_output(["pacman", "-Ql", name], text=True).splitlines()
+    plugins = [Path(line.split(maxsplit=1)[1]) for line in files
+               if line.split(maxsplit=1)[1].endswith("/okularGenerator_mupdfng.so")]
+    if len(plugins) != 1 or not plugins[0].is_file():
+        raise ValueError(f"Expected one installed MuPDF-NG generator in {name}")
+    return plugins[0], {"name": name, "version": version, "plugin_sha256": file_hash(plugins[0])}
+
+
+def collect_environment(settings, source_dir, package=None):
     cpu_info = Path("/proc/cpuinfo")
     cpu_model = platform.processor()
     if cpu_info.exists():
@@ -146,8 +164,9 @@ def collect_environment(settings, source_dir):
             "available_cpus": len(os.sched_getaffinity(0)),
             "python": platform.python_version(), "plugin_build": settings,
             "protocol": PROTOCOL, "protocol_sha256": protocol_hash.hexdigest(),
-            "source_commit": command_output(["git", "-C", str(source_dir), "rev-parse", "HEAD"]),
-            "source_dirty": command_output(["git", "-C", str(source_dir), "status", "--porcelain"]) != "",
+            "mupdf_package": package,
+            "source_commit": None if package else command_output(["git", "-C", str(source_dir), "rev-parse", "HEAD"]),
+            "source_dirty": False if package else command_output(["git", "-C", str(source_dir), "status", "--porcelain"]) != "",
             "benchmark_commit": command_output(["git", "-C", str(ROOT), "rev-parse", "HEAD"]),
             "benchmark_dirty": command_output(["git", "-C", str(ROOT), "status", "--porcelain"]) != "",
             "runner_image": os.environ.get("ImageOS", "local"),
@@ -156,7 +175,7 @@ def collect_environment(settings, source_dir):
             "versions": {"poppler": command_output(["pkg-config", "--modversion", "poppler-qt6"]),
                          "okular": command_output(["okular", "--version"]),
                          "compiler": command_output([settings.get("CMAKE_CXX_COMPILER", "c++"), "--version"]),
-                         "mupdf": (source_dir / "cmake/mupdf.version").read_text().splitlines()[0]}}
+                         "mupdf": package["version"] if package else (source_dir / "cmake/mupdf.version").read_text().splitlines()[0]}}
 
 
 def build_settings(plugin):
@@ -179,7 +198,9 @@ def main():
                         help="plugin source checkout (default: sibling okular-mupdf-ng)")
     parser.add_argument("--harness", type=Path, default=ROOT / "bench/build/okular-bench")
     parser.add_argument("--mupdf-plugin", type=Path, help="default: SOURCE_DIR/build-release generator")
+    parser.add_argument("--mupdf-package", help="use an installed pacman package instead of a MuPDF-NG source build")
     parser.add_argument("--poppler-plugin", type=Path, help="default: discover installed Qt 6 generator")
+    parser.add_argument("--pdfium-plugin", type=Path, help="also benchmark PDFium in each trial, reusing MuPDF-NG measurements")
     parser.add_argument("--repeats", type=positive_int, default=30)
     parser.add_argument("--pages", type=positive_int, default=20)
     parser.add_argument("--width", type=positive_int, default=1200)
@@ -189,7 +210,15 @@ def main():
     parser.add_argument("--output", type=Path, help="new JSONL output file; existing files are never overwritten")
     args = parser.parse_args()
     args.source_dir = args.source_dir.resolve()
-    if not (args.source_dir / "cmake/mupdf.version").is_file():
+    package = None
+    if args.mupdf_package:
+        if args.mupdf_plugin:
+            parser.error("--mupdf-package discovers the installed plugin; omit --mupdf-plugin")
+        try:
+            args.mupdf_plugin, package = installed_mupdf_package(args.mupdf_package)
+        except (OSError, ValueError, subprocess.CalledProcessError) as error:
+            parser.error(str(error))
+    if not package and not (args.source_dir / "cmake/mupdf.version").is_file():
         parser.error("--source-dir must point to the okular-mupdf-ng source checkout")
     if args.mupdf_plugin is None:
         args.mupdf_plugin = args.source_dir / "build-release/bin/okular_generators/okularGenerator_mupdfng.so"
@@ -208,7 +237,7 @@ def main():
                 [(paper["id"], paper["sha256"]) for paper in papers]).encode()).hexdigest()}
     except (OSError, ValueError, KeyError, TypeError) as error:
         parser.error(str(error))
-    for path in [args.harness, args.mupdf_plugin, *([args.poppler_plugin] if args.poppler_plugin else [])]:
+    for path in [args.harness, args.mupdf_plugin, *[p for p in (args.poppler_plugin, args.pdfium_plugin) if p]]:
         if not path.is_file():
             parser.error(f"File not found: {path}. Build the plugin separately; see bench/README.md.")
     settings = build_settings(args.mupdf_plugin)
@@ -217,7 +246,8 @@ def main():
     timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     output = args.output or ROOT / f"bench/results/{timestamp}-{os.getpid()}.jsonl"
     output.parent.mkdir(parents=True, exist_ok=True)
-    environment = collect_environment(settings, args.source_dir)
+    environment = (collect_environment(settings, None, package) if package
+                   else collect_environment(settings, args.source_dir))
     configuration = {"repeats": args.repeats, "pages": args.pages, "width": args.width, "seed": args.seed}
     reports = []
     try:
@@ -229,11 +259,13 @@ def main():
             pdf = paper["path"]
             for trial in range(args.repeats):
                 seed = (args.seed + trial) % 2**32
-                for backend in backend_order(trial):
+                order = three_backend_order(trial) if args.pdfium_plugin else backend_order(trial)
+                for backend in order:
                     command = [str(args.harness.resolve()), "--backend", backend, "--pdf", str(pdf),
                                "--width", str(args.width), "--pages", str(args.pages),
                                "--seed", str(seed), "--timeout-ms", str(args.page_timeout_ms)]
-                    plugin = args.mupdf_plugin if backend == "mupdfng" else args.poppler_plugin
+                    plugin = {"mupdfng": args.mupdf_plugin, "poppler": args.poppler_plugin,
+                              "pdfium": args.pdfium_plugin}[backend]
                     if plugin:
                         command.extend(["--library", str(plugin.resolve())])
                     if "pages" in paper:

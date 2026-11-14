@@ -183,27 +183,44 @@ uv run --project bench --locked python bench/run_pdfium.py \
 
 ## Benchmark with packaged MuPDF-NG
 
-Run the **Packaged MuPDF-NG vs PDFium benchmark** workflow
+Run the **Packaged MuPDF-NG vs Poppler and PDFium benchmark** workflow
 ([`benchmark-packaged.yml`](../.github/workflows/benchmark-packaged.yml)) manually
 from GitHub Actions. It imports and locally signs the `home_23ro_Arch` repository
 key, installs `home_23ro_Arch/okular-mupdf-ng`, and builds the PDFium backend and
 benchmark harness. It does not check out or build MuPDF-NG.
 
-This workflow publishes the separate PDFium chart and tables in `PDFIUM.md`.
+This workflow measures MuPDF-NG, Poppler, and PDFium together in one corpus
+pass. Each document/trial runs each backend once with the same requests and
+seed. A six-trial cycle balances backend positions; the same MuPDF-NG samples
+are used in both comparisons. It publishes Poppler history in `README.md` and `trend.svg`, and
+PDFium history in `PDFIUM.md` and `pdfium-trend.svg`. Each comparison has its
+own chart and tables. Poppler reports and compressed raw samples are stored
+under `reports/package-<plugin-sha256>/<run-id>/`.
 Packaged runs identify MuPDF-NG by its installed package version and plugin
 SHA-256, rather than a source commit. Raw trials and the installed package list
 are included in the workflow artifacts. The source-build workflow remains
 available independently; both workflows share the results publication lock.
 
-To benchmark an already installed package locally, build PDFium and the harness
-as above, then run:
+Both runners accept `--mupdf-package okular-mupdf-ng` without a source checkout.
+For a local three-backend run, build PDFium and the main harness (`bench/build`),
+then measure once and compile both reports from that file:
 
 ```sh
-uv run --project bench --locked python bench/run_pdfium.py \
-  --mupdf-package okular-mupdf-ng \
+uv run --project bench --locked python bench/run.py \
+  --mupdf-package okular-mupdf-ng --manifest corpus/manifest.json \
+  --pdfium-plugin ../okular-backend-pdfium/build/plugins/okular_generators/okularGenerator_pdfium.so \
+  --output /tmp/packaged-samples.jsonl
+uv run --project bench --locked python bench/report.py \
+  --input /tmp/packaged-samples.jsonl --manifest corpus/manifest.json \
   --results-dir /tmp/packaged-benchmark-results --run-id local-package-1 \
-  --run-url https://example.invalid/run --output /tmp/packaged-samples.jsonl
+  --run-url https://github.com/l4rzy/okular-backends-benchmark/actions/runs/local
+uv run --project bench --locked python bench/run_pdfium.py \
+  --input /tmp/packaged-samples.jsonl --manifest corpus/manifest.json \
+  --results-dir /tmp/packaged-benchmark-results --run-id local-package-1 \
+  --run-url https://github.com/l4rzy/okular-backends-benchmark/actions/runs/local
 ```
+
+Reporting shared trials enforces the same clean-checkout checks as source runs.
 
 ## Tests
 

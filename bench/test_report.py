@@ -48,6 +48,48 @@ def summarize(rows, manifest):
 
 
 class TestReport(unittest.TestCase):
+    def test_package_reports_and_source_reports_share_history(self):
+        rows, manifest = fixture()
+        source = copy.deepcopy(summarize(rows, manifest))
+        package = {"name": "okular-mupdf-ng", "version": "okular-mupdf-ng 1.2.3-1",
+                   "plugin_sha256": "c" * 64}
+        for row in rows:
+            row["environment"].update(mupdf_package=package, source_commit=None, plugin_build={})
+            if row["backend"] == "mupdfng":
+                row["plugin_sha256"] = package["plugin_sha256"]
+        summary = report.build_summary(rows, manifest, "manifest", None, REPOSITORY, "124-1", RUN_URL)
+        self.assertIsNone(summary["commit"])
+        self.assertEqual(summary["score"], source["score"])
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            raw = root / "samples.jsonl"
+            raw.write_text("\n".join(json.dumps(row) for row in rows))
+            corpus = root / "manifest.json"
+            corpus.write_text(json.dumps(manifest))
+            report.publish(raw, corpus, root / "results", source)
+            destination = report.publish(raw, corpus, root / "results", summary)
+            self.assertEqual(destination.parent.name, "package-" + package["plugin_sha256"])
+            text = (root / "results/README.md").read_text()
+            self.assertIn(package["version"], text)
+            self.assertIn(COMMIT[:12], text)
+            self.assertIn(f"reports/package-{package['plugin_sha256']}/124-1/report.md", text)
+            self.assertIn(package["version"], (destination / "report.md").read_text())
+            self.assertNotIn("/commit/None", text)
+        for change in ("hash", "dirty", "failed", "sandbox"):
+            with self.subTest(change=change):
+                bad = copy.deepcopy(rows)
+                if change == "hash":
+                    bad[0]["plugin_sha256"] = "wrong"
+                elif change == "dirty":
+                    for row in bad:
+                        row["environment"]["benchmark_dirty"] = True
+                elif change == "failed":
+                    bad[0]["status"] = "error"
+                else:
+                    bad[0]["sandbox_enforcement"] = "Strict"
+                with self.assertRaises(ValueError):
+                    report.build_summary(bad, manifest, "manifest", None, REPOSITORY, "124-1", RUN_URL)
+
     def test_workflow_url_belongs_to_benchmark_repo(self):
         rows, manifest = fixture()
         with self.assertRaisesRegex(ValueError, "workflow run URL"):

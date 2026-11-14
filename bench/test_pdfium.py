@@ -3,11 +3,14 @@ import copy
 import json
 from pathlib import Path
 import tempfile
+from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 import xml.etree.ElementTree as ET
 
 import run_pdfium
+import report
+from test_report import fixture, COMMIT, REPOSITORY, RUN_URL
 
 
 def summary():
@@ -22,6 +25,52 @@ def summary():
 
 
 class TestPdfium(unittest.TestCase):
+    def test_shared_run_reuses_mupdf_trials_for_both_reports(self):
+        rows, manifest = fixture()
+        pdfium_rows = copy.deepcopy([row for row in rows if row["backend"] == "poppler"])
+        for row in pdfium_rows:
+            row["backend"] = "pdfium"
+            for sample in row["samples"]:
+                sample["elapsed_ms"] *= 2
+        rows.extend(pdfium_rows)
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            corpus = root / "manifest.json"
+            corpus.write_text(json.dumps(manifest))
+            library = root / "pdfium/lib/libpdfium.so"
+            library.parent.mkdir(parents=True)
+            library.touch()
+            for row in rows:
+                plugin = root / (row["backend"] + ".so")
+                plugin.write_bytes(row["backend"].encode())
+                row.update(plugin_path=str(plugin), plugin_sha256=run_pdfium.common.file_hash(plugin))
+                row["corpus"]["sha256"] = run_pdfium.common.file_hash(corpus)
+            raw = root / "samples.jsonl"
+            raw.write_text("\n".join(json.dumps(row) for row in rows))
+            args = SimpleNamespace(input=raw, manifest=corpus, pdfium_source_dir=root,
+                                   run_id="123-1", run_url=RUN_URL)
+            poppler = report.build_summary([row for row in rows if row["backend"] != "pdfium"],
+                                           manifest, run_pdfium.common.file_hash(corpus),
+                                           COMMIT, REPOSITORY, args.run_id, args.run_url)
+            with (patch.object(run_pdfium, "git_value", return_value="b" * 40),
+                  patch.object(run_pdfium.common, "run_trial", side_effect=AssertionError("must not remeasure"))):
+                pdfium = run_pdfium.summarize_input(args)
+                self.assertEqual(poppler["score"]["median"], 4)
+                self.assertAlmostEqual(pdfium["score"]["median"], 8)
+                for a, b in zip(poppler["documents"], pdfium["documents"]):
+                    self.assertEqual(a["timings"]["mupdfng"]["render_ms"]["median"], b["mupdf_median_ms"])
+                for change in ("missing", "failed", "seed"):
+                    bad = copy.deepcopy(rows)
+                    if change == "missing":
+                        bad.pop()
+                    elif change == "failed":
+                        bad[-1]["status"] = "error"
+                    else:
+                        bad[-1]["seed"] += 1
+                    raw.write_text("\n".join(json.dumps(row) for row in bad))
+                    with self.subTest(change=change), self.assertRaises(ValueError):
+                        run_pdfium.summarize_input(args)
+
     def test_installed_package_discovery(self):
         with tempfile.TemporaryDirectory() as directory:
             plugin = Path(directory) / "okularGenerator_mupdfng.so"

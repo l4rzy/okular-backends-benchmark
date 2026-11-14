@@ -67,7 +67,7 @@ int main(int argc, char** argv)
     QCommandLineParser parser;
     parser.setApplicationDescription("Measure Okular backend page delivery; emits one JSON report.");
     parser.addHelpOption();
-    parser.addOptions({ { "backend", "Backend: mupdfng or poppler", "name" },
+    parser.addOptions({ { "backend", "Backend: mupdfng, poppler, or pdfium", "name" },
                         { "library", "Absolute generator library path (otherwise discover by backend)", "path" },
                         { "pdf", "PDF to open", "path" },
                         { "width", "Page width in pixels; height preserves aspect ratio", "pixels", "1200" },
@@ -78,8 +78,8 @@ int main(int argc, char** argv)
     parser.process(app);
     const QString backend = parser.value("backend");
     QJsonObject report { { "backend", backend }, { "qt_version", qVersion() }, { "build_type", BENCH_BUILD_TYPE } };
-    if (backend != "mupdfng" && backend != "poppler")
-        return finish(report, "--backend must be mupdfng or poppler");
+    if (backend != "mupdfng" && backend != "poppler" && backend != "pdfium")
+        return finish(report, "--backend must be mupdfng, poppler, or pdfium");
     bool widthOk = false, pagesOk = false, timeoutOk = false, seedOk = false;
     const int width = parser.value("width").toInt(&widthOk);
     const int count = parser.value("pages").toInt(&pagesOk);

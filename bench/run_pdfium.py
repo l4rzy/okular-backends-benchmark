@@ -37,13 +37,7 @@ def cpu_model():
 
 
 def installed_mupdf_package(name):
-    version = subprocess.check_output(["pacman", "-Q", name], text=True).strip()
-    files = subprocess.check_output(["pacman", "-Ql", name], text=True).splitlines()
-    plugins = [Path(line.split(maxsplit=1)[1]) for line in files
-               if line.split(maxsplit=1)[1].endswith("/okularGenerator_mupdfng.so")]
-    if len(plugins) != 1 or not plugins[0].is_file():
-        raise ValueError(f"Expected one installed MuPDF-NG generator in {name}")
-    return plugins[0], {"name": name, "version": version, "plugin_sha256": common.file_hash(plugins[0])}
+    return common.installed_mupdf_package(name)
 
 
 def render_time(report, pages):
@@ -161,6 +155,60 @@ def update_markdown(path, summaries, latest):
     return replace_block(text, LATEST_START, LATEST_END, latest_rows)
 
 
+def publish_summary(summary, results_dir):
+    summary_path = results_dir / "reports-pdfium" / f'{summary["run_id"]}.json'
+    summary_path.parent.mkdir(parents=True, exist_ok=True)
+    summary_path.write_text(json.dumps(summary, indent=2) + "\n")
+    summaries = [json.loads(path.read_text()) for path in summary_path.parent.glob("*.json")]
+    summaries.sort(key=lambda item: (item["timestamp_utc"], item["run_id"]))
+    pdfium_md = results_dir / "PDFIUM.md"
+    plot_trend(summaries, results_dir / "pdfium-trend.svg")
+    pdfium_md.write_text(update_markdown(pdfium_md, summaries, summaries[-1]))
+    print(f'PDFium comparison complete: median ratio {summary["score"]["median"]:.3f}×; report {summary_path}')
+
+
+def summarize_input(args):
+    import report
+
+    rows = [json.loads(line) for line in args.input.read_text().splitlines() if line.strip()]
+    if any(row["backend"] not in ("mupdfng", "poppler", "pdfium") for row in rows):
+        raise ValueError("Unexpected backend in shared run")
+    rows = [row for row in rows if row["backend"] != "poppler"]
+    if not rows:
+        raise ValueError("No MuPDF-NG/PDFium trials in shared run")
+    # Reuse the paired report validator and statistics for the PDFium pair.
+    # Its internal comparator is named poppler; presentation keeps PDFium labels.
+    mapped = [{**row, "backend": "poppler" if row["backend"] == "pdfium" else row["backend"]}
+              for row in rows]
+    environment = rows[0]["environment"]
+    manifest = json.loads(args.manifest.read_text())
+    validated = report.build_summary(mapped, manifest, common.file_hash(args.manifest),
+                                     environment["source_commit"], "l4rzy/okular-mupdf-ng",
+                                     args.run_id, args.run_url)
+    plugins = {}
+    builds = {}
+    for backend in ("mupdfng", "pdfium"):
+        row = next(row for row in rows if row["backend"] == backend)
+        path = Path(row["plugin_path"])
+        if common.file_hash(path) != row["plugin_sha256"]:
+            raise ValueError(f"{backend} plugin changed since measurement")
+        plugins[backend] = {"sha256": row["plugin_sha256"]}
+        builds[backend] = common.build_settings(path)
+    return {"schema_version": 1, "run_id": args.run_id, "run_url": args.run_url,
+            "timestamp_utc": validated["timestamp_utc"], "mupdf_commit": validated["commit"],
+            "pdfium_commit": git_value(args.pdfium_source_dir.resolve(), "rev-parse", "HEAD"),
+            "mupdf_package": environment.get("mupdf_package"), "plugins": plugins,
+            "plugin_builds": builds, "cpu_model": environment["cpu_model"], "machine": environment["machine"],
+            "pdfium_library_sha256": common.file_hash(args.pdfium_source_dir / "pdfium/lib/libpdfium.so"),
+            "corpus_sha256": common.file_hash(args.manifest), "configuration": validated["configuration"],
+            "score": validated["score"], "samples_file": str(args.input),
+            "documents": [{"id": document["id"], "pages": document["pages"],
+                           "ratio_median": document["ratios"]["render_ms"]["median"],
+                           "mupdf_median_ms": document["timings"]["mupdfng"]["render_ms"]["median"],
+                           "pdfium_median_ms": document["timings"]["poppler"]["render_ms"]["median"]}
+                          for document in validated["documents"]]}
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source-dir", type=Path, default=ROOT.parent / "okular-mupdf-ng")
@@ -178,8 +226,16 @@ def main():
     parser.add_argument("--width", type=int, default=1200)
     parser.add_argument("--seed", type=int, default=1)
     parser.add_argument("--timeout", type=int, default=120)
-    parser.add_argument("--output", type=Path, required=True)
+    mode = parser.add_mutually_exclusive_group(required=True)
+    mode.add_argument("--output", type=Path, help="measure and write new raw trials")
+    mode.add_argument("--input", type=Path, help="report existing shared trials without measuring again")
     args = parser.parse_args()
+    if args.input:
+        try:
+            publish_summary(summarize_input(args), args.results_dir)
+        except (OSError, ValueError, KeyError, TypeError, subprocess.CalledProcessError) as error:
+            parser.error(str(error))
+        return 0
 
     args.source_dir = args.source_dir.resolve()
     args.pdfium_source_dir = args.pdfium_source_dir.resolve()
@@ -298,15 +354,7 @@ def main():
                "configuration": {"repeats": args.repeats, "pages": args.pages, "width": args.width,
                                  "seed": args.seed},
                "score": score, "documents": documents, "samples_file": str(args.output)}
-    summary_path = args.results_dir / "reports-pdfium" / f'{args.run_id}.json'
-    summary_path.parent.mkdir(parents=True, exist_ok=True)
-    summary_path.write_text(json.dumps(summary, indent=2) + "\n")
-    summaries = [json.loads(path.read_text()) for path in summary_path.parent.glob("*.json")]
-    summaries.sort(key=lambda item: (item["timestamp_utc"], item["run_id"]))
-    pdfium_md = args.results_dir / "PDFIUM.md"
-    plot_trend(summaries, args.results_dir / "pdfium-trend.svg")
-    pdfium_md.write_text(update_markdown(pdfium_md, summaries, summary))
-    print(f'PDFium comparison complete: median ratio {score["median"]:.3f}×; report {summary_path}')
+    publish_summary(summary, args.results_dir)
     return 0
 
 

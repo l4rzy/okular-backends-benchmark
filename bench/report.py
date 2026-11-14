@@ -49,7 +49,7 @@ def render_time(row):
 
 def build_summary(rows, manifest, manifest_sha, commit, repository, run_id, run_url, allow_dirty=False,
                   workflow_repository="l4rzy/okular-backends-benchmark"):
-    if not re.fullmatch(r"[0-9a-f]{40}", commit) or not re.fullmatch(r"[\w.-]+/[\w.-]+", repository):
+    if (commit is not None and not re.fullmatch(r"[0-9a-f]{40}", commit)) or not re.fullmatch(r"[\w.-]+/[\w.-]+", repository):
         raise ValueError("Invalid source commit or repository")
     if not re.fullmatch(r"[\w.-]+", run_id) or run_id in (".", ".."):
         raise ValueError("Invalid run ID")
@@ -62,10 +62,18 @@ def build_summary(rows, manifest, manifest_sha, commit, repository, run_id, run_
     environment = rows[0]["environment"]
     configuration = rows[0]["configuration"]
     build = environment["plugin_build"]
-    if build.get("CMAKE_BUILD_TYPE") != "Release" or build.get("ENABLE_MU_DEBUG") != "OFF":
-        raise ValueError("Publishing requires Release with diagnostics disabled")
-    if build.get("DISABLE_WORKER_SANDBOX") != "OFF":
-        raise ValueError("Publishing requires the worker sandbox")
+    package = environment.get("mupdf_package")
+    if package:
+        if (commit is not None or not package.get("name") or not package.get("version")
+                or not re.fullmatch(r"[0-9a-f]{64}", package.get("plugin_sha256", ""))):
+            raise ValueError("Invalid installed MuPDF-NG package provenance")
+    else:
+        if commit is None:
+            raise ValueError("Source runs require a source commit")
+        if build.get("CMAKE_BUILD_TYPE") != "Release" or build.get("ENABLE_MU_DEBUG") != "OFF":
+            raise ValueError("Publishing requires Release with diagnostics disabled")
+        if build.get("DISABLE_WORKER_SANDBOX") != "OFF":
+            raise ValueError("Publishing requires the worker sandbox")
     if environment["source_commit"] != commit or (environment["source_dirty"] and not allow_dirty):
         raise ValueError("Source commit mismatch or uncommitted source changes")
     if environment["benchmark_dirty"] and not allow_dirty:
@@ -92,6 +100,8 @@ def build_summary(rows, manifest, manifest_sha, commit, repository, run_id, run_
         if row.get("sandbox_enforcement") != "Relaxed":
             raise ValueError("Unexpected benchmark sandbox enforcement profile")
         backend = row["backend"]
+        if package and backend == "mupdfng" and row["plugin_sha256"] != package["plugin_sha256"]:
+            raise ValueError("MuPDF-NG plugin does not match the installed package")
         if backend not in ("mupdfng", "poppler") or not 1 <= row["trial"] <= configuration["repeats"]:
             raise ValueError("Invalid backend or trial number")
         if backend in pairs[(identifier, row["trial"])]:
@@ -164,10 +174,23 @@ def build_summary(rows, manifest, manifest_sha, commit, repository, run_id, run_
                           "messages": row["warnings"]} for row in rows if row.get("warnings")]}
 
 
+def source_reference(summary):
+    package = summary["environment"].get("mupdf_package")
+    if package:
+        return package["version"]
+    commit = summary["commit"]
+    return f'[{commit[:12]}](https://github.com/{summary["repository"]}/commit/{commit})'
+
+
+def report_key(summary):
+    package = summary["environment"].get("mupdf_package")
+    return "package-" + package["plugin_sha256"] if package else summary["commit"]
+
+
 def markdown_report(summary):
     score = summary["score"]
     lines = ["# PDF backend benchmark", "",
-             f'Source commit: [{summary["commit"]}](https://github.com/{summary["repository"]}/commit/{summary["commit"]}).', "",
+             f'MuPDF-NG commit / package: {source_reference(summary)}.', "",
              f'Benchmark commit: `{summary["environment"]["benchmark_commit"]}`.', "",
              f'Run: [{summary["run_id"]}]({summary["run_url"]}), {summary["timestamp_utc"]}.', "",
              f'**Median paired rendering ratio: {score["median"]:.3f}×** '
@@ -215,15 +238,14 @@ def update_readme(text, summaries):
              "Opening and worker startup are excluded. Each PDF has equal weight. "
              "Lines group runs by CPU model and Poppler version. "
              "Intervals describe within-run variability, not hardware-independent uncertainty.", "",
-             "| Date | Source commit | Median ratio (95% interval) | Pairs/PDF | Report |",
+             "| Date | MuPDF-NG commit / package | Median ratio (95% interval) | Pairs/PDF | Report |",
              "|---|---|---:|---:|---|"]
     for summary in reversed(summaries[-50:]):
         score = summary["score"]
-        commit = summary["commit"]
-        lines.append(f'| {summary["timestamp_utc"][:10]} | [{commit[:12]}](https://github.com/{summary["repository"]}/commit/{commit}) | '
+        lines.append(f'| {summary["timestamp_utc"][:10]} | {source_reference(summary)} | '
                      f'{score["median"]:.3f}× ({score["ci95"][0]:.3f}–{score["ci95"][1]:.3f}) | '
                      f'{summary["configuration"]["repeats"]} | '
-                     f'[details](reports/{commit}/{summary["run_id"]}/report.md) |')
+                     f'[details](reports/{report_key(summary)}/{summary["run_id"]}/report.md) |')
     lines += ["", "The latest 50 runs are listed here; all detailed reports remain under `reports/`.", END]
     block = "\n".join(lines)
     if START in text or END in text:
@@ -272,7 +294,7 @@ def plot_trend(summaries, output):
 
 
 def publish(raw, manifest_path, results_dir, summary):
-    destination = results_dir / "reports" / summary["commit"] / summary["run_id"]
+    destination = results_dir / "reports" / report_key(summary) / summary["run_id"]
     destination.mkdir(parents=True, exist_ok=False)
     (destination / "samples.jsonl.gz").write_bytes(gzip.compress(raw.read_bytes(), mtime=0))
     (destination / "corpus-manifest.json").write_bytes(manifest_path.read_bytes())
@@ -292,7 +314,7 @@ def main():
     parser.add_argument("--input", type=Path, required=True)
     parser.add_argument("--manifest", type=Path, required=True)
     parser.add_argument("--results-dir", type=Path, required=True)
-    parser.add_argument("--commit", required=True)
+    parser.add_argument("--commit", help="source commit; omit for installed-package runs")
     parser.add_argument("--repository", default="l4rzy/okular-mupdf-ng")
     parser.add_argument("--run-id", required=True)
     parser.add_argument("--run-url", required=True)
@@ -301,6 +323,7 @@ def main():
     args = parser.parse_args()
     try:
         rows = [json.loads(line) for line in args.input.read_text().splitlines() if line.strip()]
+        rows = [row for row in rows if row["backend"] != "pdfium"]
         manifest = json.loads(args.manifest.read_text())
         summary = build_summary(rows, manifest, file_hash(args.manifest), args.commit,
                                 args.repository, args.run_id, args.run_url, args.allow_dirty, args.workflow_repository)

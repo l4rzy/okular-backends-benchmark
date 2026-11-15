@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "run_id": "43747655757-1",
+  "run_url": "https://github.com/l4rzy/okular-backends-benchmark/actions/runs/43747655757",
+  "timestamp_utc": "2026-11-15T18:53:00.544986+00:00",
+  "mupdf_commit": null,
+  "pdfium_commit": "9faa704a10511654cf5e38e2285a61167cd65947",
+  "mupdf_package": {
+    "name": "okular-mupdf-ng",
+    "version": "okular-mupdf-ng 0.6.4-1",
+    "plugin_sha256": "509b88133744dd354b5ce74ee41bf5ab6ba61c352a1f84e17fdbfe1dce48825b"
+  },
+  "plugins": {
+    "mupdfng": {
+      "sha256": "509b88133744dd354b5ce74ee41bf5ab6ba61c352a1f84e17fdbfe1dce48825b"
+    },
+    "pdfium": {
+      "sha256": "21c0d2b9aafdac911fb84a0f4af6029ef5ffaf604891fac365f00d216cef9064"
+    }
+  },
+  "plugin_builds": {
+    "mupdfng": {},
+    "pdfium": {
+      "CMAKE_BUILD_TYPE": "Release",
+      "CMAKE_CXX_COMPILER": "/usr/sbin/clang++"
+    }
+  },
+  "cpu_model": "AMD EPYC 9V45 96-Core Processor",
+  "machine": "x86_64",
+  "pdfium_library_sha256": "66e304f9bdcbab0ffcf20f50bd045ff64741f868c035c14fe717d9f59e628dae",
+  "corpus_sha256": "3f7cbb69936a4067423beaffea2333fc7756f4288cd5a5f12cac647c7eedf862",
+  "configuration": {
+    "repeats": 30,
+    "pages": 20,
+    "width": 1200,
+    "seed": 1
+  },
+  "score": {
+    "n": 30,
+    "median": 0.790589082161241,
+    "min": 0.7615411425306082,
+    "max": 0.8119830519445597,
+    "p95": 0.8081728767717472,
+    "ci95": [
+      0.7881043564334086,
+      0.7959613105186294
+    ]
+  },
+  "samples_file": "/__w/_temp/benchmark-run/samples.jsonl",
+  "documents": [
+    {
+      "id": "2609.00625v1",
+      "pages": 14,
+      "ratio_median": 0.926371336315437,
+      "mupdf_median_ms": 1735.9159055,
+      "pdfium_median_ms": 1614.7598255
+    },
+    {
+      "id": "2609.09123v1",
+      "pages": 24,
+      "ratio_median": 0.8852020445287823,
+      "mupdf_median_ms": 1602.085537,
+      "pdfium_median_ms": 1416.546357
+    },
+    {
+      "id": "2610.26067v1",
+      "pages": 16,
+      "ratio_median": 0.7915364744132722,
+      "mupdf_median_ms": 1991.119708,
+      "pdfium_median_ms": 1572.85844
+    },
+    {
+      "id": "2312.00752v2",
+      "pages": 36,
+      "ratio_median": 0.6519831125202626,
+      "mupdf_median_ms": 420.19807149999997,
+      "pdfium_median_ms": 272.513708
+    },
+    {
+      "id": "2307.03109v9",
+      "pages": 45,
+      "ratio_median": 0.7349840791153568,
+      "mupdf_median_ms": 375.76045650000003,
+      "pdfium_median_ms": 277.3905325
+    }
+  ]
+}

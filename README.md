@@ -14,6 +14,7 @@ Median ratio = Poppler / MuPDF-NG rendering time; **above 1 favors MuPDF-NG**. O
 
 | Date | MuPDF-NG commit / package | Median ratio (95% interval) | Pairs/PDF | Report |
 |---|---|---:|---:|---|
+| 2026-11-21 | okular-mupdf-ng 0.6.5-1 | 2.241× (2.235–2.246) | 30 | [details](reports/package-fcbeda5993cfa6b2d492f8169528b3763abd26438e624cd92557873534c8c093/44864767601-1/report.md) |
 | 2026-11-16 | okular-mupdf-ng 0.6.4-1 | 2.214× (2.205–2.222) | 30 | [details](reports/package-a2ec04cd7edc9e648be6b97530f739938eb4c0f4239ee6f82417e34cdf2e57ee/43975757323-1/report.md) |
 | 2026-11-16 | [0c2aca4cd5ed](https://github.com/l4rzy/okular-mupdf-ng/commit/0c2aca4cd5ed25f310e30c3a332f92971e2e18bc) | 2.048× (2.034–2.056) | 30 | [details](reports/0c2aca4cd5ed25f310e30c3a332f92971e2e18bc/43879235720-1/report.md) |
 | 2026-11-15 | okular-mupdf-ng 0.6.4-1 | 2.092× (2.084–2.100) | 30 | [details](reports/package-509b88133744dd354b5ce74ee41bf5ab6ba61c352a1f84e17fdbfe1dce48825b/43747655757-1/report.md) |
